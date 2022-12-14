@@ -44,6 +44,6 @@ class TestTrain(unittest.TestCase):
             self.assertGreater(last_epoch['env3_in_acc'], 0.95)
             self.assertGreater(last_epoch['env3_in_acc'], 0.95)
 
-        with open(os.path.join(output_dir, 'out.txt')) as f:
+        with open(os.path.join(output_dir, 'out-fc-cwru.txt')) as f:
             text = f.read()
             self.assertTrue('500' in text)
