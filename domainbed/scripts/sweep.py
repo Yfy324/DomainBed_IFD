@@ -27,15 +27,16 @@ from domainbed import command_launchers
 import tqdm
 import shlex
 
+
 class Job:
     NOT_LAUNCHED = 'Not launched'
     INCOMPLETE = 'Incomplete'
     DONE = 'Done'
 
-    def __init__(self, train_args, sweep_output_dir):
-        args_str = json.dumps(train_args, sort_keys=True)
+    def __init__(self, train_args, sweep_output_dir):   # 制作command命令
+        args_str = json.dumps(train_args, sort_keys=True)   # 把python对象转换成json对象，生成的是字符串
         args_hash = hashlib.md5(args_str.encode('utf-8')).hexdigest()
-        self.output_dir = os.path.join(sweep_output_dir, args_hash)
+        self.output_dir = os.path.join(sweep_output_dir, args_hash)   # 保存文件命名
 
         self.train_args = copy.deepcopy(train_args)
         self.train_args['output_dir'] = self.output_dir
@@ -44,9 +45,9 @@ class Job:
             if isinstance(v, list):
                 v = ' '.join([str(v_) for v_ in v])
             elif isinstance(v, str):
-                v = shlex.quote(v)
+                v = shlex.quote(v)  # 返回字符串s的脱壳版本。返回值是一个字符串，在无法使用列表的情况下，可以安全地用作shell命令行中的一个标记。
             command.append(f'--{k} {v}')
-        self.command_str = ' '.join(command)
+        self.command_str = ' '.join(command)  # 将list的字符串组合起来
 
         if os.path.exists(os.path.join(self.output_dir, 'done')):
             self.state = Job.DONE
@@ -57,9 +58,9 @@ class Job:
 
     def __str__(self):
         job_info = (self.train_args['dataset'],
-            self.train_args['algorithm'],
-            self.train_args['test_envs'],
-            self.train_args['hparams_seed'])
+                    self.train_args['algorithm'],
+                    self.train_args['test_envs'],
+                    self.train_args['hparams_seed'])
         return '{}: {} {}'.format(
             self.state,
             self.output_dir,
@@ -84,26 +85,28 @@ class Job:
             shutil.rmtree(job.output_dir)
         print(f'Deleted {len(jobs)} jobs!')
 
+
 def all_test_env_combinations(n):
     """
     For a dataset with n >= 3 envs, return all combinations of 1 and 2 test
     envs.
     """
-    assert(n >= 3)
+    assert (n >= 3)
     for i in range(n):
         yield [i]
-        for j in range(i+1, n):
+        for j in range(i + 1, n):
             yield [i, j]
 
+
 def make_args_list(n_trials, dataset_names, algorithms, n_hparams_from, n_hparams, steps,
-    data_dir, task, holdout_fraction, single_test_envs, hparams):
+                   data_dir, task, holdout_fraction, single_test_envs, hparams):
     args_list = []
     for trial_seed in range(n_trials):
         for dataset in dataset_names:
             for algorithm in algorithms:
                 if single_test_envs:
-                    all_test_envs = [
-                        [i] for i in range(datasets.num_environments(dataset))]
+                    # all_test_envs = [[i] for i in range(datasets.num_environments(dataset))]
+                    all_test_envs = [[4,5,6,7]]
                 else:
                     all_test_envs = all_test_env_combinations(
                         datasets.num_environments(dataset))
@@ -119,7 +122,7 @@ def make_args_list(n_trials, dataset_names, algorithms, n_hparams_from, n_hparam
                         train_args['task'] = task
                         train_args['trial_seed'] = trial_seed
                         train_args['seed'] = misc.seed_hash(dataset,
-                            algorithm, test_envs, hparams_seed, trial_seed)
+                                                            algorithm, test_envs, hparams_seed, trial_seed)
                         if steps is not None:
                             train_args['steps'] = steps
                         if hparams is not None:
@@ -127,11 +130,13 @@ def make_args_list(n_trials, dataset_names, algorithms, n_hparams_from, n_hparam
                         args_list.append(train_args)
     return args_list
 
+
 def ask_for_confirmation():
     response = input('Are you sure? (y/n) ')
     if not response.lower().strip()[:1] == "y":
         print('Nevermind!')
         exit(0)
+
 
 DATASETS = [d for d in datasets.DATASETS if "Debug" not in d]
 
@@ -169,7 +174,7 @@ if __name__ == "__main__":
         hparams=args.hparams
     )
 
-    jobs = [Job(train_args, args.output_dir) for train_args in args_list]
+    jobs = [Job(train_args, args.output_dir) for train_args in args_list]   # 制作command命令输入，并标记这个任务是否做过
 
     for job in jobs:
         print(job)

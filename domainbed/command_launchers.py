@@ -10,10 +10,12 @@ import subprocess
 import time
 import torch
 
+
 def local_launcher(commands):
     """Launch commands serially on the local machine."""
     for cmd in commands:
         subprocess.call(cmd, shell=True)
+
 
 def dummy_launcher(commands):
     """
@@ -23,13 +25,14 @@ def dummy_launcher(commands):
     for cmd in commands:
         print(f'Dummy launcher: {cmd}')
 
+
 def multi_gpu_launcher(commands):
     """
     Launch commands on the local machine, using all GPUs in parallel.
     """
     print('WARNING: using experimental multi_gpu_launcher.')
     n_gpus = torch.cuda.device_count()
-    procs_by_gpu = [None]*n_gpus
+    procs_by_gpu = [None] * n_gpus
 
     while len(commands) > 0:
         for gpu_idx in range(n_gpus):
@@ -48,6 +51,7 @@ def multi_gpu_launcher(commands):
         if p is not None:
             p.wait()
 
+
 REGISTRY = {
     'local': local_launcher,
     'dummy': dummy_launcher,
@@ -56,6 +60,7 @@ REGISTRY = {
 
 try:
     from domainbed import facebook
+
     facebook.register_command_launchers(REGISTRY)
 except ImportError:
     pass

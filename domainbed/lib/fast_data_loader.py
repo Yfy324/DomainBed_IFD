@@ -2,8 +2,10 @@
 
 import torch
 
+
 class _InfiniteSampler(torch.utils.data.Sampler):
     """Wraps another Sampler to yield an infinite stream."""
+
     def __init__(self, sampler):
         self.sampler = sampler
 
@@ -12,17 +14,18 @@ class _InfiniteSampler(torch.utils.data.Sampler):
             for batch in self.sampler:
                 yield batch
 
+
 class InfiniteDataLoader:
     def __init__(self, dataset, weights, batch_size, num_workers):
         super().__init__()
 
         if weights is not None:
             sampler = torch.utils.data.WeightedRandomSampler(weights,
-                replacement=True,
-                num_samples=batch_size)
+                                                             replacement=True,
+                                                             num_samples=batch_size)
         else:
             sampler = torch.utils.data.RandomSampler(dataset,
-                replacement=True)
+                                                     replacement=True)
 
         if weights == None:
             weights = torch.ones(len(dataset))
@@ -45,9 +48,11 @@ class InfiniteDataLoader:
     def __len__(self):
         raise ValueError
 
+
 class FastDataLoader:
     """DataLoader wrapper with slightly improved speed by not respawning worker
     processes at every epoch."""
+
     def __init__(self, dataset, batch_size, num_workers):
         super().__init__()
 
