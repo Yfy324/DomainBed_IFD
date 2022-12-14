@@ -87,6 +87,7 @@ class IIDAccuracySelectionMethod(SelectionMethod):
             if i != test_env:
                 val_env_keys.append(f'env{i}_out_acc')
         test_in_acc_key = 'env{}_in_acc'.format(test_env)
+        # test_in_acc_key = 'env{}_in_acc'.format(0)
         return {
             'val_acc': np.mean([record[key] for key in val_env_keys]),
             'test_acc': record[test_in_acc_key]

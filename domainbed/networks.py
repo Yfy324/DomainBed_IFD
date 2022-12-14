@@ -7,6 +7,7 @@ import torchvision.models
 
 from domainbed.lib import wide_resnet
 import copy
+import warnings
 
 
 def remove_batch_norm_from_resnet(model):
@@ -92,10 +93,10 @@ class ResNet(torch.nn.Module):
                 self.network.conv1.weight.data[:, i, :, :] = tmp[:, i % 3, :, :]
 
         # save memory
-        del self.network.fc
+        del self.network.fc    # 用del一遍计算一边清除中间变量,减少显存消耗
         self.network.fc = Identity()
 
-        self.freeze_bn()
+        self.freeze_bn()   # batch_norm设定为eval模式(使用在训练模式下得到的学习参数和统计参数)
         self.hparams = hparams
         self.dropout = nn.Dropout(hparams['resnet_dropout'])
 
@@ -226,3 +227,144 @@ class WholeFish(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
+
+class CNN(nn.Module):
+    def __init__(self, pretrained=False, in_channel=1, out_channel=3):
+        super(CNN, self).__init__()
+        self.n_outputs = 64
+        if pretrained:
+            warnings.warn("Pretrained model is not available")
+
+        self.layer1 = nn.Sequential(
+            nn.Conv1d(in_channel, 16, kernel_size=3),  # 2000 / 512
+            nn.LayerNorm(510),  # 1998 / 510
+            # nn.BatchNorm1d(16),
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=2, stride=2)  # 999
+        )
+
+        self.layer2 = nn.Sequential(
+            nn.Conv1d(16, 32, kernel_size=3),  # 999
+            nn.LayerNorm(253),  # 997 / 253
+            # nn.BatchNorm1d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=2, stride=2))  # 498
+
+        self.layer3 = nn.Sequential(
+            nn.Conv1d(32, 64, kernel_size=3),  # 498
+            # nn.InstanceNorm1d(64),
+            nn.BatchNorm1d(64),  # 496
+            nn.ReLU(inplace=True),
+            nn.MaxPool1d(kernel_size=2, stride=2)  # 248
+        )
+
+        self.layer4 = nn.Sequential(
+            nn.Conv1d(64, 64, kernel_size=3),  # 248
+            # nn.InstanceNorm1d(64),
+            nn.BatchNorm1d(64),   # 246
+            nn.ReLU(inplace=True),
+            nn.AdaptiveMaxPool1d(32),    # 64pu  32
+            # nn.MaxPool1d(kernel_size=2, stride=2)
+        )  # 128, 4,4
+
+        self.layer5 = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(64*32, 256),   # (64*64, 256)cwru   (64*64,1024)pu
+            nn.ReLU(inplace=True),
+            nn.Linear(256, 64),     # (256,64)           (1024,1024)pu
+            nn.ReLU(inplace=True))
+
+        # self.fc = nn.Sequential(
+        #     nn.ReLU(),
+        #     nn.Linear(64, out_channel),
+        # )
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = x.view(x.size(0), -1)
+        x = self.layer5(x)
+        # x = self.fc(x)
+
+        return x
+
+
+def classifier_homo(in_features, class_num):
+    model = nn.Sequential(
+        nn.ReLU(),
+        nn.Linear(in_features, class_num),
+    )
+
+    def init_weights(m):
+        if type(m) == nn.Linear:
+            torch.nn.init.xavier_uniform_(m.weight)
+            m.bias.data.fill_(0.01)
+
+    model.apply(init_weights)  # 自定义初始化方式，函数 递归
+    return model
+
+
+class ContextNet1D(nn.Module):
+    def __init__(self, input_shape):
+        super(ContextNet1D, self).__init__()
+
+        # Keep same dimensions
+        padding = (5 - 1) // 2
+        self.context_net = nn.Sequential(
+            nn.Conv1d(input_shape[0], 64, 5, padding=padding),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.Conv1d(64, 64, 5, padding=padding),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.Conv1d(64, 1, 5, padding=padding),
+        )
+
+    def forward(self, x):
+        return self.context_net(x)
+
+
+class WholeFish1D(nn.Module):
+    def __init__(self, input_shape, num_classes, hparams, weights=None):
+        super(WholeFish1D, self).__init__()
+        featurizer = CNN(pretrained=False, in_channel=input_shape[0], out_channel=num_classes)
+        classifier = classifier_homo(featurizer.n_outputs, num_classes,)
+        self.net = nn.Sequential(
+            featurizer, classifier
+        )
+        if weights is not None:
+            self.load_state_dict(copy.deepcopy(weights))
+
+    def reset_weights(self, weights):
+        self.load_state_dict(copy.deepcopy(weights))
+
+    def forward(self, x):
+        return self.net(x)
+
+
+class Critic_Network_MLP(nn.Module):
+    def __init__(self, h, hh):
+        super(Critic_Network_MLP, self).__init__()
+        self.fc1 = nn.Linear(h, hh)
+        self.fc2 = nn.Linear(hh, 1)
+        # self.fc1 = nn.Linear(h, 1)
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = nn.functional.softplus(self.fc2(x))
+        return torch.mean(x)
+
+
+class Critic_Network_Flatten_FTF(nn.Module):
+    def __init__(self, h, hh):
+        super(Critic_Network_Flatten_FTF, self).__init__()
+        self.fc1 = nn.Linear(h ** 2, hh)
+        self.fc2 = nn.Linear(hh, 1)
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = nn.functional.softplus(self.fc2(x))
+        return torch.mean(x)
