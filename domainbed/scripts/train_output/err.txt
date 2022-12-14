@@ -1,0 +1,88 @@
+Traceback (most recent call last):
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 188, in <module>
+    te_splits.append(DataGenerate(args=args, domain_data=test_x[str(i)], labels=test_y[str(i)]))
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/datasets.py", line 395, in __init__
+    self.normlizetype = args.normlizetype
+AttributeError: 'Namespace' object has no attribute 'normlizetype'
+Traceback (most recent call last):
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 195, in <module>
+    if args.split_style == 'strat':
+AttributeError: 'Namespace' object has no attribute 'split_style'
+Traceback (most recent call last):
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 248, in <module>
+    len(dataset) - len(args.test_envs), hparams)  # 算法初始化：模型、优化器
+TypeError: object of type 'BearingData' has no len()
+Traceback (most recent call last):
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 248, in <module>
+    len(dataset) - len(args.test_envs), hparams)  # 算法初始化：模型、优化器
+TypeError: object of type 'BearingData' has no len()
+Traceback (most recent call last):
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 260, in <module>
+    steps_per_epoch = min([len(env) / hparams['batch_size'] for env, _ in in_splits])  # 每个迭代中，最少的step数(样本数/batch_size)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 260, in <listcomp>
+    steps_per_epoch = min([len(env) / hparams['batch_size'] for env, _ in in_splits])  # 每个迭代中，最少的step数(样本数/batch_size)
+ValueError: too many values to unpack (expected 2)
+Traceback (most recent call last):
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/IPython/core/interactiveshell.py", line 3343, in run_code
+    exec(code_obj, self.user_global_ns, self.user_ns)
+  File "<ipython-input-1-647752912216>", line 1, in <module>
+    len(in_split[0])
+NameError: name 'in_split' is not defined
+Traceback (most recent call last):
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 284, in <module>
+    for step in range(start_step, n_steps):
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 340, in <module>
+    if args.save_model_every_checkpoint:
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 315, in <module>
+    acc = misc.accuracy(algorithm, loader, weights, device)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 174, in accuracy
+    p = network.predict(x)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/algorithms.py", line 124, in predict
+    return self.network(x)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/container.py", line 119, in forward
+    input = module(input)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/networks.py", line 287, in forward
+    x = self.layer4(x)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/container.py", line 119, in forward
+    input = module(input)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/modules/batchnorm.py", line 140, in forward
+    self.weight, self.bias, bn_training, exponential_average_factor, self.eps)
+  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/nn/functional.py", line 2150, in batch_norm
+    input, weight, bias, running_mean, running_var, training, momentum, eps, torch.backends.cudnn.enabled
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 340, in <module>
+    if args.save_model_every_checkpoint:
+KeyboardInterrupt
