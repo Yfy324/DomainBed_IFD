@@ -29385,145 +29385,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.8253086420  1.0000000000  0.9938271605  1.0000000000  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.9753086420  0.8259259259  0.7592592593  0.8456790123  0.8703703704  32.098765432  0.7968284309  0.3833513260  650           0.0790586710 
 0.8401234568  1.0000000000  0.9938271605  1.0000000000  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.9753086420  0.8518518519  0.7691358025  0.8604938272  0.8790123457  32.592592592  0.8207746148  0.3833513260  660           0.0752008438 
 0.8398148148  1.0000000000  1.0000000000  1.0000000000  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.9876543210  0.8481481481  0.7740740741  0.8604938272  0.8765432099  33.086419753  0.7741767406  0.3833513260  670           0.0976073980 
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
 
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 218, in run
-    self._on_run()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1846, in _on_run
-    return ReaderThread._on_run(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 328, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-KeyboardInterrupt
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 319, in _exit_function
-    p.join()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 122, in join
-    assert self._parent_pid == os.getpid(), 'can only join a child process'
-AssertionError: can only join a child process
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 104, in start
-    _cleanup()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 55, in _cleanup
-    if p._popen.poll() is not None:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 28, in poll
-    pid, sts = os.waitpid(self.pid, flag)
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 28, in poll
-    pid, sts = os.waitpid(self.pid, flag)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 2898711) is killed by signal: Terminated. 
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 319, in _exit_function
-    p.join()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 124, in join
-    res = self._popen.wait(timeout)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 50, in wait
-    return self.poll(os.WNOHANG if timeout == 0.0 else 0)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 28, in poll
-    pid, sts = os.waitpid(self.pid, flag)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-RuntimeError: DataLoader worker (pid 2898340) is killed by signal: Terminated. 
 trails: 0
 Args:
 	algorithm: FC
@@ -29811,10 +29673,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.8324074074  1.0000000000  0.9938271605  1.0000000000  0.9814814815  1.0000000000  0.9629629630  1.0000000000  0.9938271605  0.8172839506  0.8320987654  0.8222222222  0.8580246914  122.46913580  0.6692346632  0.3862504959  2480          0.0751258373 
 0.8330246914  1.0000000000  0.9938271605  1.0000000000  0.9876543210  1.0000000000  0.9629629630  1.0000000000  0.9938271605  0.8185185185  0.8320987654  0.8234567901  0.8580246914  122.96296296  0.6667482615  0.3862504959  2490          0.0765569687 
 0.8367283951  1.0000000000  0.9938271605  1.0000000000  0.9753086420  1.0000000000  0.9629629630  1.0000000000  0.9876543210  0.8246913580  0.8358024691  0.8222222222  0.8641975309  123.45679012  0.6940680206  0.3862504959  2500          0.0746025085 
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 364, in <module>
-    save_checkpoint('model.pkl')
-KeyboardInterrupt
+
 trails: 0
 Args:
 	algorithm: FC
@@ -29869,68 +29728,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.7666666667  0.9382716049  0.9074074074  0.8904320988  0.8456790123  0.9367283951  0.8950617284  0.9382716049  0.9074074074  0.7629629630  0.7728395062  0.7530864198  0.7777777778  7.4074074074  0.7538303733  0.3474698067  150           0.0579183817 
 0.8438271605  0.9475308642  0.9012345679  0.8904320988  0.8333333333  0.9567901235  0.9320987654  0.9382716049  0.9135802469  0.8395061728  0.8506172840  0.8160493827  0.8691358025  7.9012345679  0.7547505498  0.3474698067  160           0.0569179773 
 0.7873456790  0.9567901235  0.9259259259  0.8703703704  0.8395061728  0.9320987654  0.9074074074  0.9259259259  0.9135802469  0.7740740741  0.7975308642  0.7679012346  0.8098765432  8.3950617284  0.7221469164  0.3474698067  170           0.0647948027 
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 517, in __next__
-    data = self._next_data()
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1182, in _next_data
-    idx, data = self._get_data()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1148, in _get_data
-    success, data = self._try_get_data()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 986, in _try_get_data
-    data = self._data_queue.get(timeout=timeout)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/queues.py", line 104, in get
-    if not self._poll(timeout):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/connection.py", line 257, in poll
-    return self._poll(timeout)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/connection.py", line 414, in _poll
-    r = wait([self], timeout)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/connection.py", line 911, in wait
-    ready = selector.select(timeout)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/selectors.py", line 376, in select
-    fd_event_list = self._poll.poll(timeout)
-KeyboardInterrupt
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 319, in _exit_function
-    p.join()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 122, in join
-    assert self._parent_pid == os.getpid(), 'can only join a child process'
-AssertionError: can only join a child process
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 28, in poll
-    pid, sts = os.waitpid(self.pid, flag)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 63, in handler
-    def handler(signum, frame):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 3515299) is killed by signal: Terminated. 
+
 trails: 0
 Args:
 	algorithm: FC
@@ -30088,247 +29886,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.8361111111  1.0000000000  0.9938271605  1.0000000000  0.9753086420  1.0000000000  0.9567901235  1.0000000000  0.9876543210  0.8283950617  0.8283950617  0.8259259259  0.8617283951  58.271604938  0.0188717993  0.3476352692  1180          0.0578058004 
 0.8379629630  1.0000000000  0.9876543210  1.0000000000  0.9814814815  1.0000000000  0.9629629630  1.0000000000  0.9938271605  0.8259259259  0.8320987654  0.8296296296  0.8641975309  58.765432098  0.0140268459  0.3476352692  1190          0.0566360712 
 0.8422839506  1.0000000000  0.9876543210  1.0000000000  0.9814814815  1.0000000000  0.9629629630  1.0000000000  0.9938271605  0.8271604938  0.8407407407  0.8308641975  0.8703703704  59.259259259  0.0111501753  0.3476352692  1200          0.0579325914 
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
 
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-KeyboardInterrupt
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-KeyboardInterrupt
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-
-During handling of the above exception, another exception occurred:
-
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-Traceback (most recent call last):
-Traceback (most recent call last):
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-
-During handling of the above exception, another exception occurred:
-
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-KeyboardInterrupt
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 218, in run
-    self._on_run()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1846, in _on_run
-    return ReaderThread._on_run(self)
-
-During handling of the above exception, another exception occurred:
-
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 328, in _on_run
-    self.handle_except()
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 218, in run
-    self._on_run()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1846, in _on_run
-    return ReaderThread._on_run(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 328, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-KeyboardInterrupt
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 218, in run
-    self._on_run()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1846, in _on_run
-    return ReaderThread._on_run(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 328, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 175, in accuracy
-    y = y.to(device)
-KeyboardInterrupt
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 329, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 319, in _exit_function
-    p.join()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 122, in join
-    assert self._parent_pid == os.getpid(), 'can only join a child process'
-AssertionError: can only join a child process
-Exception ignored in: <bound method _MultiProcessingDataLoaderIter.__del__ of <torch.utils.data.dataloader._MultiProcessingDataLoaderIter object at 0x7fea8c3e3390>>
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1324, in __del__
-    self._shutdown_workers()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1321, in _shutdown_workers
-    w.terminate()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 116, in terminate
-    self._popen.terminate()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 56, in terminate
-    os.kill(self.pid, signal.SIGTERM)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 3515413) is killed by signal: Terminated. 
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 28, in poll
-    pid, sts = os.waitpid(self.pid, flag)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-RuntimeError: DataLoader worker (pid 3516393) is killed by signal: Terminated. 
-trails: 0
-Args:
-	algorithm: FC
-	checkpoint_freq: None
-	data_dir: /home/yfy/Desktop/Dataset/
-	dataset: Bearing
-	holdout_fraction: 0.2
-	hparams: None
-	hparams_seed: 0
-	normlizetype: 0-1
-	output_dir: train_output
-	save_model_every_checkpoint: False
-	seed: 0
-	skip_model_save: False
-	steps: None
-	task: domain_generalization
-	test_envs: [4, 5, 6, 7]
-	trial_seed: 0
-	uda_holdout_fraction: 0
-HParams:
-	batch_size: 32
-	beta: 1
-	class_balanced: False
-	data_augmentation: True
-	heldout_p: 100
-	lr: 0.0005
-	lr_omega: 0.005
-	meta_step: 1
-	nonlinear_classifier: True
-	resnet18: False
-	resnet_dropout: 0.0
-	weight_decay: 0.0008
-Load Data.
-pu1->pu3
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 196, in <module>
-    train_x, train_y, tr_num = dataset.pu_domain()
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/datasets.py", line 615, in pu_domain
-    tr_x = Ax
-KeyboardInterrupt
 trails: 0
 Args:
 	algorithm: FC
@@ -30403,24 +29961,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.4414846755  1.0000000000  1.0000000000  0.9728915663  0.8915662651  0.9985029940  0.9940476190  1.0000000000  1.0000000000  0.4192771084  0.4927536232  0.3574879227  0.4964200477  16.867469879  0.0082111659  0.2655940056  350           0.0575038910 
 0.4589518532  1.0000000000  1.0000000000  0.9352409639  0.8493975904  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.4578313253  0.4734299517  0.4009661836  0.5035799523  17.349397590  0.0271797765  0.2655940056  360           0.0565393448 
 0.4331053313  1.0000000000  1.0000000000  0.9864457831  0.9337349398  0.9985029940  0.9940476190  1.0000000000  1.0000000000  0.4506024096  0.4492753623  0.3671497585  0.4653937947  17.831325301  0.0185575365  0.2655940056  370           0.0584491968 
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 517, in __next__
-    data = self._next_data()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1171, in _next_data
-    self._shutdown_workers()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1292, in _shutdown_workers
-    self._mark_worker_as_unavailable(worker_id, shutdown=True)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 1239, in _mark_worker_as_unavailable
-    q.put(None)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/queues.py", line 87, in put
-    self._start_thread()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/queues.py", line 169, in _start_thread
-    self._thread.start()
-KeyboardInterrupt
+
 trails: 0
 Args:
 	algorithm: FC
@@ -30494,16 +30035,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.4572786980  0.9984939759  0.9939759036  0.9879518072  0.9156626506  1.0000000000  1.0000000000  0.9984962406  0.9940119760  0.4433734940  0.5410628019  0.3840579710  0.4606205251  16.385542168  0.7594752610  0.3833441734  340           0.0764938831 
 0.4608716767  1.0000000000  1.0000000000  0.9969879518  0.9397590361  0.9985029940  0.9940476190  1.0000000000  1.0000000000  0.4337349398  0.5555555556  0.3816425121  0.4725536993  16.867469879  0.7298612535  0.3833441734  350           0.0826477289 
 0.4282919440  1.0000000000  1.0000000000  0.9382530120  0.8614457831  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.4096385542  0.5096618357  0.3260869565  0.4677804296  17.349397590  0.7319549680  0.3833441734  360           0.0871737003 
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 307, in <module>
-    step_vals = algorithm.update(minibatches_device, uda_device)   # 返回的是loss 字典
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/algorithms.py", line 2298, in update
-    meta_train_loss_dg.backward(create_graph=True)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/tensor.py", line 245, in backward
-    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/autograd/__init__.py", line 147, in backward
-    allow_unreachable=True, accumulate_grad=True)  # allow_unreachable flag
-KeyboardInterrupt
+
 trails: 0
 Args:
 	algorithm: FC
@@ -30548,28 +30080,7 @@ average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_ac
 0.6981624653  0.8614457831  0.7831325301  0.8810240964  0.8253012048  0.9655688623  0.9464285714  0.9939849624  0.9640718563  0.9894578313  0.9939759036  0.7566265060  0.9803625378  0.9698795181  0.6256038647  0.9773413897  0.9698795181  0.7149758454  0.9955223881  0.9940476190  0.6954436451  2.4169184290  3.0275573015  0.6690397263  50            0.1292138100 
 0.6668643294  0.9051204819  0.8614457831  0.8930722892  0.8373493976  0.9760479042  0.9523809524  0.9939849624  0.9760479042  0.9969879518  1.0000000000  0.7518072289  0.9697885196  0.9518072289  0.5555555556  0.9818731118  0.9759036145  0.7198067633  0.9970149254  1.0000000000  0.6402877698  2.9003021148  2.6360277653  0.6690397263  60            0.1400502205 
 0.6379049929  0.9743975904  0.9578313253  0.8915662651  0.8313253012  0.9940119760  0.9642857143  0.9939849624  0.9760479042  0.9969879518  1.0000000000  0.7156626506  0.9335347432  0.9397590361  0.5072463768  0.9864048338  0.9939759036  0.6908212560  0.9970149254  1.0000000000  0.6378896882  3.3836858006  2.6175489426  0.6690397263  70            0.1385496616 
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-KeyboardInterrupt
+
 trails: 0
 Args:
 	algorithm: FC
@@ -30641,266 +30152,7 @@ average_acc   env0_in_acc   env0_out_acc  env10_test_a  env11_test_a  env1_in_ac
 0.7207940614  0.8689759036  0.8614457831  0.7512077295  0.7255369928  0.9969879518  0.9277108434  0.8697604790  0.8511904762  0.9774436090  0.9580838323  0.9924698795  0.9939759036  0.9486404834  0.9277108434  0.9879154079  0.9879518072  1.0000000000  1.0000000000  0.7373493976  0.6690821256  15.468277945  1.8228947043  0.4828839302  320           0.1394054174 
 0.6981380748  0.9849397590  0.9518072289  0.7971014493  0.6205250597  0.9743975904  0.8975903614  0.9790419162  0.9523809524  0.9969924812  0.9760479042  1.0000000000  1.0000000000  0.6435045317  0.6746987952  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.7807228916  0.5942028986  15.951661631  1.9779598117  0.4828839302  330           0.1327384472 
 0.7005348258  0.9563253012  0.9337349398  0.7850241546  0.6276849642  0.9954819277  0.9216867470  0.9281437126  0.9047619048  0.9879699248  0.9760479042  1.0000000000  1.0000000000  0.7492447130  0.8072289157  1.0000000000  1.0000000000  1.0000000000  0.9880239521  0.7759036145  0.6135265700  16.435045317  1.8882011175  0.4828839302  340           0.1324768543 
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
 
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 292, in _on_run
-    r = self.sock.recv(1024)
-KeyboardInterrupt
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 296, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 218, in run
-    self._on_run()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1846, in _on_run
-    return ReaderThread._on_run(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 328, in _on_run
-    self.handle_except()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1849, in handle_except
-    ReaderThread.handle_except(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_comm.py", line 332, in handle_except
-    self.global_debugger_holder.global_dbg.finish_debugging_session()
-AttributeError: 'NoneType' object has no attribute 'finish_debugging_session'
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-KeyboardInterrupt
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 914, in __init__
-    w.start()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 105, in start
-    self._popen = self._Popen(self)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 223, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/popen_fork.py", line 66, in _launch
-    self.pid = os.fork()
-KeyboardInterrupt
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 319, in _exit_function
-    p.join()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/process.py", line 122, in join
-    assert self._parent_pid == os.getpid(), 'can only join a child process'
-AssertionError: can only join a child process
-Traceback (most recent call last):
-
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 2173, in <module>
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 2164, in main
-    globals = debugger.run(setup['file'], None, None, is_module)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1476, in run
-    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
-    pydev_imports.execfile(file, globals, locals)  # execute the script
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
-    exec(compile(contents+"\n", file, 'exec'), glob, loc)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 173190) is killed by signal: Terminated. 
-Error in sys.excepthook:
-
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd_file_utils.py", line 557, in get_abs_path_real_path_and_base_from_file
-
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd_file_utils.py", line 230, in _NormPaths
-    return NORM_PATHS_CONTAINER[filename]
-KeyError: '/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/typeshed/stubs/Deprecated'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_breakpoints.py", line 178, in _fallback_excepthook
-    stop_on_unhandled_exception(debugger, thread, additional_info, (exctype, value, tb))
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_breakpoints.py", line 165, in stop_on_unhandled_exception
-    py_db.stop_on_unhandled_exception(thread, frame, frames_byid, arg)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1253, in stop_on_unhandled_exception
-    tb = pydevd_utils.get_top_level_trace_in_project_scope(tb)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 448, in get_top_level_trace_in_project_scope
-    if is_top_level_trace_in_project_scope(trace):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 322, in is_top_level_trace_in_project_scope
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 310, in is_exception_trace_in_project_scope
-    elif in_project_roots(trace.tb_frame.f_code.co_filename):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 280, in in_project_roots
-    library_roots = _get_library_roots()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 261, in _get_library_roots
-    return _get_roots(library_roots_cache, 'LIBRARY_ROOTS', set_library_roots, _get_default_library_roots)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 208, in _get_roots
-    set_when_not_cached(roots)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 256, in set_library_roots
-    roots = _set_roots(roots, _LIBRARY_ROOTS_CACHE)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 188, in _set_roots
-    new_roots.append(_normpath(root))
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_utils.py", line 27, in _normpath
-    return pydevd_file_utils.get_abs_path_real_path_and_base_from_file(filename)[0]
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd_file_utils.py", line 571, in get_abs_path_real_path_and_base_from_file
-    abs_path, real_path = _NormPaths(f)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd_file_utils.py", line 238, in _NormPaths
-    real_path = _NormPath(filename, rPath)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd_file_utils.py", line 246, in _NormPath
-    r = normpath(filename)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/posixpath.py", line 395, in realpath
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/posixpath.py", line 428, in _joinrealpath
-    newpath = join(path, name)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/posixpath.py", line 75, in join
-    def join(a, *p):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 172383) is killed by signal: Terminated. 
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_breakpoints.py", line 178, in _fallback_excepthook
-    stop_on_unhandled_exception(debugger, thread, additional_info, (exctype, value, tb))
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 171663) is killed by signal: Terminated. 
-
-Original exception was:
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 355, in __iter__
-    return self._get_iterator()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/dataloader.py", line 301, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydevd_bundle/pydevd_trace_dispatch.py", line 56, in trace_dispatch
-    def trace_dispatch(py_db, frame, event, arg):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 172765) is killed by signal: Terminated. 
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 2173, in <module>
-    main()
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 2164, in main
-    globals = debugger.run(setup['file'], None, None, is_module)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1476, in run
-    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/pydevd.py", line 1483, in _exec
-    pydev_imports.execfile(file, globals, locals)  # execute the script
-  File "/usr/pycharm/pycharm-2021.3.1/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
-    exec(compile(contents+"\n", file, 'exec'), glob, loc)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
-    acc = misc.accuracy(algorithm, loader, weights, device)
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/lib/misc.py", line 173, in accuracy
-    for x, y in loader:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 173190) is killed by signal: Terminated. 
-Exception ignored in: <module 'threading' from '/home/yfy/anaconda3/envs/pytorch/lib/python3.6/threading.py'>
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/threading.py", line 1292, in _shutdown
-    t = _pickSomeNonDaemonThread()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/threading.py", line 1297, in _pickSomeNonDaemonThread
-    def _pickSomeNonDaemonThread():
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 171372) is killed by signal: Terminated. 
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/matplotlib/_pylab_helpers.py", line 89, in destroy_all
-    gc.collect(1)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 170980) is killed by signal: Terminated. 
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 262, in _run_finalizers
-    finalizer()
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/multiprocessing/util.py", line 188, in __call__
-    self._kwargs = self._key = None
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 171083) is killed by signal: Terminated. 
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/linecache.py", line 47, in getlines
-    return updatecache(filename, module_globals)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/linecache.py", line 136, in updatecache
-    with tokenize.open(fullname) as fp:
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/tokenize.py", line 452, in open
-    buffer = _builtin_open(filename, 'rb')
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
-    _error_if_any_worker_fails()
-RuntimeError: DataLoader worker (pid 170948) is killed by signal: Terminated. 
 trails: 0
 Args:
 	algorithm: FC
@@ -30961,6 +30213,57 @@ average_acc   env0_in_acc   env0_out_acc  env10_test_a  env11_test_a  env1_in_ac
 0.7184188589  0.9563253012  0.8975903614  0.7632850242  0.7088305489  0.9939759036  0.9156626506  0.9356287425  0.8988095238  0.9894736842  0.9700598802  0.9924698795  0.9939759036  0.8338368580  0.8674698795  0.9984894260  0.9939759036  1.0000000000  1.0000000000  0.7542168675  0.6473429952  10.151057401  0.3138878867  0.5854034424  210           0.0992582560 
 0.7167281037  0.9728915663  0.9277108434  0.7657004831  0.6610978520  0.9774096386  0.8855421687  0.9610778443  0.9404761905  0.9909774436  0.9760479042  1.0000000000  1.0000000000  0.7190332326  0.7710843373  1.0000000000  1.0000000000  1.0000000000  1.0000000000  0.7927710843  0.6473429952  10.634441087  0.1788457781  0.5854034424  220           0.0985398531 
 0.6896911745  0.9954819277  0.9698795181  0.7632850242  0.6181384248  0.9668674699  0.8915662651  0.9910179641  0.9880952381  0.9984962406  0.9820359281  1.0000000000  1.0000000000  0.6948640483  0.7349397590  0.9984894260  0.9939759036  0.9985007496  0.9940119760  0.7807228916  0.5966183575  11.117824773  0.2279233620  0.5854172707  230           0.0983921766 
+
+trails: 0
+Args:
+	algorithm: FC
+	checkpoint_freq: None
+	data_dir: /home/yfy/Desktop/Dataset/
+	dataset: Bearing
+	holdout_fraction: 0.2
+	hparams: None
+	hparams_seed: 0
+	normlizetype: 0-1
+	output_dir: train_output
+	save_model_every_checkpoint: False
+	seed: 0
+	skip_model_save: False
+	steps: None
+	task: domain_generalization
+	test_envs: [4, 5, 6, 7]
+	trial_seed: 0
+	uda_holdout_fraction: 0
+HParams:
+	batch_size: 32
+	beta: 1
+	class_balanced: False
+	data_augmentation: True
+	heldout_p: 100
+	lr: 0.0001
+	lr_omega: 0.005
+	meta_step: 1
+	nonlinear_classifier: True
+	resnet18: False
+	resnet_dropout: 0.0
+	weight_decay: 0.0008
+Load Data.
+pu1,2->pu3
+Start training
+average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_acc   env2_out_acc  env3_in_acc   env3_out_acc  env4_in_acc   env4_out_acc  env4_test_ac  env5_in_acc   env5_out_acc  env5_test_ac  env6_in_acc   env6_out_acc  env6_test_ac  env7_in_acc   env7_out_acc  env7_test_ac  epoch         loss          mem_gb        step          step_time    
+0.4349449827  0.3343373494  0.3493975904  0.3403614458  0.3734939759  0.3323353293  0.3333333333  0.3473684211  0.3532934132  0.3358433735  0.3313253012  0.4361445783  0.3429003021  0.3313253012  0.4275362319  0.3338368580  0.3313253012  0.4444444444  0.3328358209  0.3273809524  0.4316546763  0.0000000000  10.365321159  0.2909131050  0             0.4849593639 
+0.3668026815  0.7665662651  0.7771084337  0.5165662651  0.4759036145  0.7619760479  0.7083333333  0.5984962406  0.5988023952  0.8945783133  0.8674698795  0.3373493976  0.8383685801  0.8253012048  0.3816425121  0.8187311178  0.8072289157  0.3357487923  0.7492537313  0.7857142857  0.4124700240  0.4833836858  8.8949287415  0.4781484604  10            0.1362748146 
+0.4240881574  0.8192771084  0.8192771084  0.6596385542  0.6024096386  0.8532934132  0.8095238095  0.7729323308  0.7664670659  0.9156626506  0.9036144578  0.5373493976  0.8157099698  0.8192771084  0.3333333333  0.8504531722  0.8614457831  0.4347826087  0.9029850746  0.8988095238  0.3908872902  0.9667673716  7.1776003838  0.4781484604  20            0.1327249289 
+0.4439142348  0.9096385542  0.8915662651  0.7198795181  0.6385542169  0.9176646707  0.8988095238  0.8766917293  0.8443113772  0.9141566265  0.9216867470  0.5686746988  0.8413897281  0.8493975904  0.3285024155  0.8202416918  0.8253012048  0.4420289855  0.9059701493  0.8988095238  0.4364508393  1.4501510574  5.5728592873  0.4781484604  30            0.1331522942 
+0.4746591203  0.9412650602  0.9216867470  0.7334337349  0.6927710843  0.9595808383  0.9107142857  0.8872180451  0.8862275449  0.9593373494  0.9578313253  0.5975903614  0.8670694864  0.8795180723  0.3550724638  0.8625377644  0.8493975904  0.4903381643  0.8805970149  0.8809523810  0.4556354916  1.9335347432  4.8085256577  0.4781484604  40            0.1324635744 
+0.5620455024  0.9111445783  0.8734939759  0.7996987952  0.7650602410  0.9655688623  0.9107142857  0.9503759398  0.9461077844  0.9713855422  0.9698795181  0.6771084337  0.8927492447  0.9096385542  0.4396135266  0.9138972810  0.9096385542  0.6062801932  0.9388059701  0.9345238095  0.5251798561  2.4169184290  4.3178518295  0.4781484604  50            0.1308653355 
+0.5741516896  0.9051204819  0.8493975904  0.8177710843  0.7650602410  0.9625748503  0.9107142857  0.9563909774  0.9341317365  0.9894578313  0.9939759036  0.7012048193  0.9123867069  0.9277108434  0.4565217391  0.9456193353  0.9518072289  0.6376811594  0.9820895522  0.9880952381  0.5011990408  2.9003021148  3.8569582701  0.4781484604  60            0.1336482048 
+0.5662870228  0.9292168675  0.9096385542  0.8147590361  0.7530120482  0.9670658683  0.9285714286  0.9789473684  0.9640718563  0.9909638554  0.9879518072  0.6819277108  0.9003021148  0.9036144578  0.4589371981  0.9305135952  0.9277108434  0.6086956522  0.9820895522  0.9880952381  0.5155875300  3.3836858006  3.6014107704  0.4782390594  70            0.1365423679 
+0.6211082993  0.9021084337  0.8493975904  0.8659638554  0.8253012048  0.9640718563  0.9285714286  0.9864661654  0.9700598802  0.9894578313  0.9939759036  0.7108433735  0.9305135952  0.9277108434  0.5120772947  0.9577039275  0.9397590361  0.6835748792  0.9835820896  0.9940476190  0.5779376499  3.8670694864  3.4342602968  0.4782390594  80            0.1342673302 
+0.5711642734  0.9186746988  0.8554216867  0.8057228916  0.7650602410  0.9775449102  0.9345238095  0.9548872180  0.9281437126  0.9969879518  1.0000000000  0.6843373494  0.9138972810  0.9216867470  0.4879227053  0.9818731118  0.9759036145  0.6231884058  0.9940298507  1.0000000000  0.4892086331  4.3504531722  3.1940466166  0.4782390594  90            0.1318883181 
+0.5434242653  0.9698795181  0.9518072289  0.7801204819  0.7349397590  0.9835329341  0.9464285714  0.9744360902  0.9221556886  1.0000000000  1.0000000000  0.6433734940  0.9018126888  0.9096385542  0.4734299517  0.9577039275  0.9518072289  0.5748792271  0.9791044776  0.9642857143  0.4820143885  4.8338368580  3.2303690672  0.4782390594  100           0.1316791773 
+0.6162759264  0.9563253012  0.9457831325  0.8614457831  0.8072289157  0.9685628743  0.9464285714  0.9909774436  0.9760479042  0.9894578313  0.9939759036  0.7132530120  0.9078549849  0.9096385542  0.5120772947  0.9290030211  0.9216867470  0.6618357488  0.9895522388  0.9821428571  0.5779376499  5.3172205438  3.0637862921  0.4782390594  110           0.1295827389 
+0.6205087580  0.9412650602  0.9457831325  0.8674698795  0.8192771084  0.9730538922  0.9523809524  0.9939849624  0.9760479042  0.9969879518  1.0000000000  0.7180722892  0.9214501511  0.9156626506  0.5241545894  0.9561933535  0.9578313253  0.6666666667  0.9940298507  1.0000000000  0.5731414868  5.8006042296  3.0690907240  0.4782390594  120           0.1339442968 
+0.5723257120  0.9759036145  0.9638554217  0.8207831325  0.7650602410  0.9895209581  0.9583333333  0.9759398496  0.9401197605  1.0000000000  1.0000000000  0.6674698795  0.9078549849  0.9096385542  0.4855072464  0.9592145015  0.9578313253  0.6159420290  0.9895522388  0.9821428571  0.5203836930  6.2839879154  2.8387702227  0.4782390594  130           0.1350031853 
 Traceback (most recent call last):
   File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 330, in <module>
     acc = misc.accuracy(algorithm, loader, weights, device)
@@ -30997,7 +30300,7 @@ Args:
 	skip_model_save: False
 	steps: None
 	task: domain_generalization
-	test_envs: [4, 5, 6, 7]
+	test_envs: [8, 9, 10, 11]
 	trial_seed: 0
 	uda_holdout_fraction: 0
 HParams:
@@ -31006,7 +30309,7 @@ HParams:
 	class_balanced: False
 	data_augmentation: True
 	heldout_p: 100
-	lr: 0.0005
+	lr: 0.0001
 	lr_omega: 0.005
 	meta_step: 1
 	nonlinear_classifier: True
@@ -31014,17 +30317,5 @@ HParams:
 	resnet_dropout: 0.0
 	weight_decay: 0.0008
 Load Data.
-B->A
+pu1,2->pu3
 Start training
-average_acc   env0_in_acc   env0_out_acc  env1_in_acc   env1_out_acc  env2_in_acc   env2_out_acc  env3_in_acc   env3_out_acc  env4_test_ac  env5_test_ac  env6_test_ac  env7_test_ac  epoch         loss          mem_gb        step          step_time    
-0.3432098765  0.3364197531  0.3456790123  0.3395061728  0.3456790123  0.3395061728  0.3333333333  0.3410493827  0.3333333333  0.3407407407  0.3419753086  0.3469135802  0.3432098765  0.0000000000  4.4635930061  0.1364407539  0             0.4132666588 
-Traceback (most recent call last):
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/scripts/train.py", line 307, in <module>
-    step_vals = algorithm.update(minibatches_device, uda_device)   # 返回的是loss 字典
-  File "/home/yfy/Desktop/my_project/DomainBed-IFD/domainbed/algorithms.py", line 2298, in update
-    meta_train_loss_dg.backward(create_graph=True)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/tensor.py", line 245, in backward
-    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
-  File "/home/yfy/anaconda3/envs/pytorch/lib/python3.6/site-packages/torch/autograd/__init__.py", line 147, in backward
-    allow_unreachable=True, accumulate_grad=True)  # allow_unreachable flag
-KeyboardInterrupt
