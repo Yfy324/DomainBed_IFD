@@ -886,7 +886,7 @@ class PU(object):
 
                 domain_num += 1
                 # print('\n')
-        return data, lab, len(lab)
+        return data, lab, len(lab)   # 数据，标签，域数量
 
     def get_files_agg(self):
         # data = {}
@@ -1287,3 +1287,13 @@ class CPUMP(object):
             start += signal_size
             end += signal_size
         return data, lab
+
+
+class BearingRUL(object):
+
+    def __init__(self, dir, dataname):
+        self.name = dataname
+        self.dir = dir
+
+    def get_data(self):
+        bearing_names = os.listdir(self.dir)

@@ -644,3 +644,30 @@ class Bearing(object):
 
         print('Start training')
         return tr_x, tr_y, tr_n
+
+
+class RUL(object):
+    N_STEPS = 2001  #851 Default, subclasses may override
+    CHECKPOINT_FREQ = 50  # Default, subclasses may override
+    N_WORKERS = 8  # Default, subclasses may override
+    ENVIRONMENTS = ['PHM1', 'PHM2', 'PHM3', 'XJTU1', 'XJTU2']  # Subclasses should override
+    INPUT_SHAPE = (1, 100)  # Subclasses should override
+
+    def __init__(self, data_dir, dataname):
+        self.input_shape = (1, 100)
+        self.num_classes = 2
+        self.dir = data_dir
+        self.domain_num = None
+        self.dataname = [RUL.ENVIRONMENTS[i] for i in dataname]
+
+    def get_domains(self, task, all_data='1'):
+        # task = ['1']
+        dataname = [self.dataname+i for i in task]
+        self.domain_num = len(task)
+        print("Load Data.")
+
+        if all_data == '1':
+            print('xjtu1 -> xjtu1')
+            Ax, Ay, numA = BearingRUL(self.dir, dataname)
+            Ax, Ay, numA = PU(self.dir, task='[pu1, pu2]').get_files()
+            Bx, By, numB = PU(self.dir, task='[pu3]').get_files()

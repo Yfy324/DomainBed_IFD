@@ -29,7 +29,7 @@ from visdom import Visdom
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Domain generalization')
-    parser.add_argument('--data_dir', default='/home/yfy/Desktop/Dataset/', type=str)
+    parser.add_argument('--data_dir', default='/data/yfy/FD-data/', type=str)
     parser.add_argument('--dataset', type=str, default="Bearing")
     parser.add_argument('--algorithm', type=str, default="FC")
     parser.add_argument('--task', type=str, default="domain_generalization",
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # viz = Visdom()
     # viz.line([0.], [1.], win='train_loss', opts=dict(title='train_loss'))
 
-    print("Environment:")  #ERM
+    print("Environment:")
     print("\tPython: {}".format(sys.version.split(" ")[0]))
     print("\tPyTorch: {}".format(torch.__version__))
     print("\tTorchvision: {}".format(torchvision.__version__))
@@ -233,20 +233,22 @@ if __name__ == "__main__":
                 num_workers=dataset.N_WORKERS)
                 for env in mtedatalist]
 
-            eval_loaders = [DataLoader(
+            eval_loaders = [FastDataLoader(
                 dataset=env,
                 batch_size=hparams['batch_size'],
                 num_workers=dataset.N_WORKERS,
-                drop_last=False,
-                shuffle=False)
+                # drop_last=False,
+                # shuffle=False
+            )
                 for env in (in_splits + out_splits + te_splits)]
 
-            test_loaders = [DataLoader(
+            test_loaders = [FastDataLoader(  # FastDataLoader
                 dataset=env,
                 batch_size=hparams['batch_size'],
                 num_workers=dataset.N_WORKERS,
-                drop_last=False,
-                shuffle=False)
+                # drop_last=False,
+                # shuffle=False
+            )
                 for env in te_splits]
             uda_loaders = []
 
@@ -262,7 +264,7 @@ if __name__ == "__main__":
             domain_num = tr_num - len(args.test_envs)
 
         algorithm_class = algorithms.get_algorithm_class(args.algorithm)    # 算法实例化
-        algorithm = algorithm_class(dataset.input_shape, dataset.num_classes, domain_num, hparams)  # 算法初始化：模型、优化器
+        algorithm = algorithm_class(dataset.input_shape, dataset.num_classes, domain_num, hparams)  # 算法初始化：含模型、优化器
 
         if algorithm_dict is not None:
             algorithm.load_state_dict(algorithm_dict)
