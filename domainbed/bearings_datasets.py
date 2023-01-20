@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 from scipy.io import loadmat
 from scipy import signal
 import torch
@@ -1297,3 +1298,22 @@ class BearingRUL(object):
 
     def get_data(self):
         bearing_names = os.listdir(self.dir)
+        bearing_names.sort()
+        bearing_data = {}
+        bearing_lab = {}
+        count = 0
+        for i in self.name:
+            bearing_data[str(count)] = []
+            bearing_lab[str(count)] = []
+            for j in bearing_names:
+                if i in j:
+                    data = pd.read_csv(os.path.join(self.dir, j), header=None)
+                    data = np.array(data)
+                    bearing_data[str(count)].append(data[:, :-1])
+                    bearing_lab[str(count)].append(data[:, -1])
+
+            count += 1
+
+        return bearing_data, bearing_lab, len(self.name)
+
+

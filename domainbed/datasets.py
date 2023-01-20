@@ -653,21 +653,21 @@ class RUL(object):
     ENVIRONMENTS = ['PHM1', 'PHM2', 'PHM3', 'XJTU1', 'XJTU2']  # Subclasses should override
     INPUT_SHAPE = (1, 100)  # Subclasses should override
 
-    def __init__(self, data_dir, dataname):
+    def __init__(self, data_dir, dataname, test_envs):
         self.input_shape = (1, 100)
         self.num_classes = 2
         self.dir = data_dir
-        self.domain_num = None
-        self.dataname = [RUL.ENVIRONMENTS[i] for i in dataname]
+        self.train = [RUL.ENVIRONMENTS[i] for i in dataname]
+        self.test = [RUL.ENVIRONMENTS[i] for i in test_envs]
+        self.domain_num = len(dataname)
 
-    def get_domains(self, task, all_data='1'):
-        # task = ['1']
-        dataname = [self.dataname+i for i in task]
-        self.domain_num = len(task)
+    def get_domains(self):
+
         print("Load Data.")
 
-        if all_data == '1':
-            print('xjtu1 -> xjtu1')
-            Ax, Ay, numA = BearingRUL(self.dir, dataname)
-            Ax, Ay, numA = PU(self.dir, task='[pu1, pu2]').get_files()
-            Bx, By, numB = PU(self.dir, task='[pu3]').get_files()
+        print('Train data: ', self.train)
+        print('Test data: ', self.test)
+
+        tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train+self.test).get_data()
+
+        return tr_x, tr_y, tr_n

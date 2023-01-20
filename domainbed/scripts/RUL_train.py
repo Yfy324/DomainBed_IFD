@@ -49,7 +49,7 @@ if __name__ == "__main__":
                         help='Number of steps. Default is dataset-dependent.')
     parser.add_argument('--checkpoint_freq', type=int, default=None,
                         help='Checkpoint every N steps. Default is dataset-dependent.')
-    parser.add_argument('--test_envs', type=int, nargs='+', default=[8,9,10,11])  # TODO: for cv, modify the default to [0]
+    parser.add_argument('--test_envs', type=int, nargs='+', default=[1])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
     parser.add_argument('--output_dir', type=str, default="train_output")
     parser.add_argument('--holdout_fraction', type=float, default=0.2)
     parser.add_argument('--uda_holdout_fraction', type=float, default=0,
@@ -113,14 +113,14 @@ if __name__ == "__main__":
         if args.dataset != 'RUL':
             pass
         else:
-            dataset = vars(datasets)[args.dataset](args.data_dir, args.data_name
-                                                   # ,args.test_envs, hparams
+            dataset = vars(datasets)[args.dataset](args.data_dir, args.data_name,
+                                                   args.test_envs,
+                                                   # hparams
                                                    )
-            task = ['1']
             # train_x, train_y, tr_num = dataset.construct_domain()
             # train_x, train_y, tr_num = dataset.cwru_domain()
             # train_x, train_y, tr_num = dataset.pu_domain()
-            train_x, train_y, tr_num = dataset.get_domains(task=task)
+            train_x, train_y, tr_num = dataset.get_domains()
 
             rate = args.holdout_fraction
             in_splits, te_splits, mtedatalist, out_splits = [], [], [], []
@@ -160,20 +160,22 @@ if __name__ == "__main__":
                 num_workers=dataset.N_WORKERS)
                 for env in mtedatalist]
 
-            eval_loaders = [DataLoader(
+            eval_loaders = [FastDataLoader(
                 dataset=env,
                 batch_size=hparams['batch_size'],
                 num_workers=dataset.N_WORKERS,
-                drop_last=False,
-                shuffle=False)
+                # drop_last=False,
+                # shuffle=False
+            )
                 for env in (in_splits + out_splits + te_splits)]
 
-            test_loaders = [DataLoader(
+            test_loaders = [FastDataLoader(
                 dataset=env,
                 batch_size=hparams['batch_size'],
                 num_workers=dataset.N_WORKERS,
-                drop_last=False,
-                shuffle=False)
+                # drop_last=False,
+                # shuffle=False
+            )
                 for env in te_splits]
             uda_loaders = []
 
