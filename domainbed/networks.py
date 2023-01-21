@@ -238,16 +238,16 @@ class CNN(nn.Module):
 
         self.layer1 = nn.Sequential(
             nn.Conv1d(in_channel, 16, kernel_size=3),  # 2000 / 512
-            nn.LayerNorm(510),  # 1998 / 510
-            # nn.BatchNorm1d(16),
+            # nn.LayerNorm(510),  # 1998 / 510
+            nn.BatchNorm1d(16),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=2, stride=2)  # 999
         )
 
         self.layer2 = nn.Sequential(
             nn.Conv1d(16, 32, kernel_size=3),  # 999
-            nn.LayerNorm(253),  # 997 / 253
-            # nn.BatchNorm1d(32),
+            # nn.LayerNorm(253),  # 997 / 253
+            nn.BatchNorm1d(32),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=2, stride=2))  # 498
 

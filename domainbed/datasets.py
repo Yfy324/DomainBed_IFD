@@ -647,7 +647,7 @@ class Bearing(object):
 
 
 class RUL(object):
-    N_STEPS = 2001  #851 Default, subclasses may override
+    N_STEPS = 4001  #851 Default, subclasses may override
     CHECKPOINT_FREQ = 50  # Default, subclasses may override
     N_WORKERS = 8  # Default, subclasses may override
     ENVIRONMENTS = ['PHM1', 'PHM2', 'PHM3', 'XJTU1', 'XJTU2']  # Subclasses should override
@@ -668,6 +668,9 @@ class RUL(object):
         print('Train data: ', self.train)
         print('Test data: ', self.test)
 
-        tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train+self.test).get_data()
+        if self.test == self.test:
+            tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train).get_data()
+        else:
+            tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train+self.test).get_data()
 
         return tr_x, tr_y, tr_n

@@ -115,7 +115,7 @@ class ERM(Algorithm):
 
     def update(self, minibatches, unlabeled=None):
         all_x = torch.cat([x for x, y in minibatches])
-        all_y = torch.cat([y for x, y in minibatches])
+        all_y = torch.cat([y for x, y in minibatches]).long()
         loss = F.cross_entropy(self.predict(all_x), all_y)   # ARM在predict处不同，输出也不同
 
         self.optimizer.zero_grad()

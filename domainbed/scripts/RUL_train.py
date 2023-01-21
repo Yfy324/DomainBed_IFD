@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', type=str, default="RUL")
     parser.add_argument('--data_name', type=int, default=[0],
                         help='each index corresponds to a str in [PHM1, PHM2, PHM3, XJTU1, XJTU2]')
-    parser.add_argument('--algorithm', type=str, default="FC")
+    parser.add_argument('--algorithm', type=str, default="ERM")
     parser.add_argument('--task', type=str, default="domain_generalization",
                         choices=["domain_generalization", "domain_adaptation"])
     parser.add_argument('--hparams', type=str,
@@ -125,26 +125,58 @@ if __name__ == "__main__":
             rate = args.holdout_fraction
             in_splits, te_splits, mtedatalist, out_splits = [], [], [], []
 
-            # for i in range(te_num):
-            #     te_splits.append(DataGenerate(args=args, domain_data=test_x[str(i)], labels=test_y[str(i)]))
+            task = args.test_envs if tr_num != 1 else [5, 6]
+            # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
+            tr_index = {str(i for i in args.data_name): [0, 1, 2, 3, 4]}  # range(len(train_x[i]))
+            te_index = {str(args.test_envs): [5, 6]}
 
-            for i in range(tr_num):
-                if i in args.test_envs:
-                    te_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)], labels=train_y[str(i)]))
-                else:
-                    tmpdatay = DataGenerate(args=args, domain_data=train_x[str(i)], labels=train_y[str(i)], ).labels
+            for k, v in tr_index.items():
+                for i in v:
+                    te_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
+
+            for k, v in te_index.items():
+                for i in v:
+                    tmpdatay = DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k]).labels
                     l = len(tmpdatay)
 
                     lslist = np.arange(l)
-                    stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate, random_state=args.seed)  # 划分训练/验证集
+                    stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
+                                                        random_state=args.seed)  # 划分训练/验证集
                     stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
                     indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
                     np.random.seed(args.seed)
                     indexmte = np.random.permutation(indextr)
 
-                    in_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)], labels=train_y[str(i)], indices=indextr))
-                    mtedatalist.append(DataGenerate(args=args, domain_data=train_x[str(i)], labels=train_y[str(i)], indices=indexmte))
-                    out_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)], labels=train_y[str(i)], indices=indexval))
+                    in_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k],
+                                                  indices=indextr))
+                    mtedatalist.append(
+                        DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k],
+                                     indices=indexmte))
+                    out_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k],
+                                                   indices=indexval))
+
+            # for i in range(tr_num):
+            #     if args.test_envs == args.data_name:
+            #         for task in [5,6]:
+            #
+            #     elif i in args.test_envs:
+            #         for j in range(len(train_x[str(i)])):
+            #             te_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][j], labels=train_y[str(i)][j]))
+            #     else:
+            #         for k in range(len(train_x[str(i)])):
+            #             tmpdatay = DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k]).labels
+            #             l = len(tmpdatay)
+            #
+            #             lslist = np.arange(l)
+            #             stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate, random_state=args.seed)  # 划分训练/验证集
+            #             stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
+            #             indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
+            #             np.random.seed(args.seed)
+            #             indexmte = np.random.permutation(indextr)
+            #
+            #             in_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k], indices=indextr))
+            #             mtedatalist.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k], indices=indexmte))
+            #             out_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k], indices=indexval))
 
             train_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
                 dataset=env,
@@ -184,10 +216,10 @@ if __name__ == "__main__":
                                  for i in range(len(in_splits))]
             eval_loader_names += ['env{}_out'.format(i)
                                   for i in range(len(out_splits))]
-            # eval_loader_names += ['env{}_test'.format(i)
-            #                       for i in range(len(te_splits))]
             eval_loader_names += ['env{}_test'.format(i)
-                                  for i in args.test_envs]
+                                  for i in range(len(te_splits))]
+            # eval_loader_names += ['env{}_test'.format(i)
+            #                       for i in args.test_envs]
             domain_num = tr_num - len(args.test_envs)
 
         algorithm_class = algorithms.get_algorithm_class(args.algorithm)    # 算法实例化

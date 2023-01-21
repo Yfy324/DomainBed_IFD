@@ -1308,9 +1308,10 @@ class BearingRUL(object):
             for j in bearing_names:
                 if i in j:
                     data = pd.read_csv(os.path.join(self.dir, j), header=None)
-                    data = np.array(data)
-                    bearing_data[str(count)].append(data[:, :-1])
-                    bearing_lab[str(count)].append(data[:, -1])
+                    data = np.array(data).reshape(data.shape[0], 1, -1)
+                    # np.expand_dims(data, axis=1)
+                    bearing_data[str(count)].append(data[:, :, :-1])
+                    bearing_lab[str(count)].append(data[:, :, -1].reshape(-1))
 
             count += 1
 
