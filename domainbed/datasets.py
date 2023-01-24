@@ -434,7 +434,7 @@ class DataGenerate(object):
         index = self.indices[index]
         img = self.input_trans(self.x[index])
         ctarget = self.target_trans(self.labels[index])
-        return img, ctarget
+        return img, ctarget, index
 
     def __len__(self):
         return len(self.indices)
@@ -668,7 +668,7 @@ class RUL(object):
         print('Train data: ', self.train)
         print('Test data: ', self.test)
 
-        if self.test == self.test:
+        if self.train == self.test:
             tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train).get_data()
         else:
             tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train+self.test).get_data()

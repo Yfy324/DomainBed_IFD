@@ -1444,7 +1444,7 @@ class TRM(Algorithm):
         iter = 10
         for i in range(iter):
             model.weight.grad *= 0
-            y = model(batch[0].detach())
+            y = model(batch[0].detach()).long()
             loss = F.cross_entropy(y, batch[1].detach())
             hv = hvp(loss, model.weight, v)
             v -= hv

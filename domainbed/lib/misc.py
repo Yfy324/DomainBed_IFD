@@ -170,7 +170,7 @@ def accuracy(network, loader, weights, device):
 
     network.eval()
     with torch.no_grad():
-        for x, y in loader:
+        for x, y, ind in loader:
             x = x.to(device)
             y = y.to(device)
             p = network.predict(x)   # ARM在predict处不同
