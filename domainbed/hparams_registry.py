@@ -196,12 +196,19 @@ def _hparams(algorithm, dataset, random_seed):
         _hparam('sd_reg', 0.1, lambda r: 10 ** r.uniform(-5, -1))
 
     elif algorithm == 'FC':
+        # maybe CWRU
         # _hparam('meta_step', 1, lambda r: int(r.choice([700, 750, 800])))
         # _hparam('beta', 0.5, lambda r: 10 ** r.uniform(-5, 1))
         # _hparam('lr_omega', 7e-3, lambda r: 10 ** r.uniform(-6, -2))
         # _hparam('heldout_p', 100, lambda r: 10 ** r.uniform(-3, 3))
 
         # PU data
+        # _hparam('meta_step', 1, lambda r: int(r.choice([700, 750, 800])))
+        # _hparam('beta', 1, lambda r: 10 ** r.uniform(-5, 1))
+        # _hparam('lr_omega', 5e-3, lambda r: 10 ** r.uniform(-6, -2))
+        # _hparam('heldout_p', 100, lambda r: 10 ** r.uniform(-3, 3))
+
+       # RUL data
         _hparam('meta_step', 1, lambda r: int(r.choice([700, 750, 800])))
         _hparam('beta', 1, lambda r: 10 ** r.uniform(-5, 1))
         _hparam('lr_omega', 5e-3, lambda r: 10 ** r.uniform(-6, -2))
@@ -213,13 +220,14 @@ def _hparams(algorithm, dataset, random_seed):
     if dataset in SMALL_IMAGES:
         _hparam('lr', 1e-3, lambda r: 10**r.uniform(-4.5, -2.5))
     else:
-        _hparam('lr', 5e-5, lambda r: 10**r.uniform(-5, -3.5))
+        # _hparam('lr', 5e-5, lambda r: 10**r.uniform(-5, -3.5))
         # _hparam('lr', 5e-4, lambda r: 10 ** r.uniform(-5.5, -3.5))   # 5e-4  C+P -> M good
         # _hparam('lr', 1e-5, lambda r: 10 ** r.uniform(-5.5, -3.5))  # C+P//'2' -> CP good GroupDRO相关算法
-        # _hparam('lr', 2.5e-5, lambda r: 10 ** r.uniform(-5.5, -3.5))  # 5e-5, 1e-5 0.80 '4'/all
+        _hparam('lr', 2.5e-5, lambda r: 10 ** r.uniform(-5.5, -3.5))  # 5e-5, 1e-5 0.80 '4'/all
         # _hparam('lr', 1e-4, lambda r: 10 ** r.uniform(-5.5, -3.5))  # FC pu data
         # _hparam('lr', 2.5e-4, lambda r: 10 ** r.uniform(-5.5, -3.5))  # FC cwru
-        _hparam('lr', 2.5e-4, lambda r: 10 ** r.uniform(-5.5, -3.5))
+        # _hparam('lr', 2.5e-5, lambda r: 10 ** r.uniform(-5.5, -3.5))
+        # _hparam('lr', 1e-3, lambda r: 10 ** r.uniform(-4.5, -2.5))
 
     if dataset in SMALL_IMAGES:
         _hparam('weight_decay', 0., lambda r: 0.)

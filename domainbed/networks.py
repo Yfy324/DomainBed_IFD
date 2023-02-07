@@ -8,6 +8,8 @@ import torchvision.models
 from domainbed.lib import wide_resnet
 import copy
 import warnings
+from typing import List
+from domainbed.tcn import TemporalConvNet
 
 
 def remove_batch_norm_from_resnet(model):
@@ -229,42 +231,45 @@ class WholeFish(nn.Module):
         return self.net(x)
 
 
+# for fault diagnosis
 class CNN(nn.Module):
     def __init__(self, pretrained=False, in_channel=1, out_channel=3):
         super(CNN, self).__init__()
-        self.n_outputs = 64
+        self.n_outputs = 64  # 64
         if pretrained:
             warnings.warn("Pretrained model is not available")
 
         self.layer1 = nn.Sequential(
-            nn.Conv1d(in_channel, 16, kernel_size=3),  # 2000 / 512
-            # nn.LayerNorm(510),  # 1998 / 510
+            nn.Conv1d(in_channel, 16, kernel_size=3),  # 2000 / 512 / 100
+            # nn.LayerNorm(510),  # 1998 / 510 / 98
+            # nn.LayerNorm(98),
             nn.BatchNorm1d(16),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=2, stride=2)  # 999
+            nn.MaxPool1d(kernel_size=2, stride=2)  # 999 / xx / 49
         )
 
         self.layer2 = nn.Sequential(
-            nn.Conv1d(16, 32, kernel_size=3),  # 999
-            # nn.LayerNorm(253),  # 997 / 253
+            nn.Conv1d(16, 32, kernel_size=3),  # 999 / xx / 49
+            # nn.LayerNorm(253),  # 997 / 253 / 47
+            # nn.LayerNorm(47),
             nn.BatchNorm1d(32),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=2, stride=2))  # 498
+            nn.MaxPool1d(kernel_size=2, stride=2))  # 498 / xx / 23
 
         self.layer3 = nn.Sequential(
-            nn.Conv1d(32, 64, kernel_size=3),  # 498
+            nn.Conv1d(32, 64, kernel_size=3),  # 498 / xx / 23
             # nn.InstanceNorm1d(64),
-            nn.BatchNorm1d(64),  # 496
+            nn.BatchNorm1d(64),  # 496 / xx / 21
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(kernel_size=2, stride=2)  # 248
+            nn.MaxPool1d(kernel_size=2, stride=2)  # 248 / xx / 10
         )
 
         self.layer4 = nn.Sequential(
-            nn.Conv1d(64, 64, kernel_size=3),  # 248
+            nn.Conv1d(64, 64, kernel_size=3),  # 248 / xx / 10
             # nn.InstanceNorm1d(64),
-            nn.BatchNorm1d(64),   # 246
+            nn.BatchNorm1d(64),   # 246 / xx / 8
             nn.ReLU(inplace=True),
-            nn.AdaptiveMaxPool1d(32),    # 64pu  32
+            nn.AdaptiveMaxPool1d(32),    # 64pu  32pu√
             # nn.MaxPool1d(kernel_size=2, stride=2)
         )  # 128, 4,4
 
@@ -274,6 +279,13 @@ class CNN(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(256, 64),     # (256,64)           (1024,1024)pu
             nn.ReLU(inplace=True))
+
+        # self.layer5 = nn.Sequential(
+        #     nn.Dropout(),
+        #     nn.Linear(64 * 4, 128),  # (64*64, 256)cwru   (64*64,1024)pu
+        #     nn.ReLU(inplace=True),
+        #     nn.Linear(128, 64),  # (256,64)           (1024,1024)pu
+        #     nn.ReLU(inplace=True))
 
         # self.fc = nn.Sequential(
         #     nn.ReLU(),
@@ -345,6 +357,7 @@ class WholeFish1D(nn.Module):
         return self.net(x)
 
 
+# for the FC algorithm
 class Critic_Network_MLP(nn.Module):
     def __init__(self, h, hh):
         super(Critic_Network_MLP, self).__init__()
@@ -368,3 +381,59 @@ class Critic_Network_Flatten_FTF(nn.Module):
         x = torch.relu(self.fc1(x))
         x = nn.functional.softplus(self.fc2(x))
         return torch.mean(x)
+
+
+# for TCN
+class Flatten(nn.Module):
+    def __init__(self, feature_size):
+        super(Flatten, self).__init__()
+        self.fs = feature_size
+
+    def forward(self, x):
+        bs, ws, fc = x.shape[:3]
+        x = x.reshape(bs, ws * fc)
+
+        return x
+
+
+class TSCP(nn.Module):
+    def __init__(self,
+                 # Prediction/Projection Head
+                 input_size: int,
+                 num_channels: List[int] = [1, 4, 16],
+                 # Encoder part
+                 output_size: int = 20,
+                 hidden_dim: int = 100,
+                 kernel_size=4,
+                 dropout=0.2,
+                 batch_norm=False,
+                 attention=False, non_linear='relu'):
+        super(TSCP, self).__init__()
+        self.n_outputs = output_size
+        self.window_size = hidden_dim
+        self.fs = num_channels[-1]
+        self.tcn = TemporalConvNet(num_inputs=input_size, num_channels=num_channels, kernel_size=kernel_size,
+                                   dropout=dropout, window_size=hidden_dim,
+                                   attention=attention)
+
+        # bs, ws, 64
+        self.out_place = output_size
+
+        self.encoder = nn.Sequential(*[
+            Flatten(self.window_size),
+            nn.Linear(self.window_size * self.fs,
+                      hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim,
+                      hidden_dim // 2),
+            nn.ReLU(),
+            nn.Linear(hidden_dim // 2,
+                      self.out_place)
+        ])  # projector
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.to(self.device)
+
+    def forward(self, x):
+        x = self.tcn(x).transpose(1, 2)  # x(B, channel, time-series) --> out(B, ts, channel)
+        x = self.encoder(x)  # out (B, coding_size//20)
+        return x

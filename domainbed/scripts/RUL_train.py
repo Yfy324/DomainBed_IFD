@@ -29,9 +29,9 @@ from visdom import Visdom
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Domain generalization')
-    parser.add_argument('--data_dir', default=r'/data/yfy/FD-data/RUL/RUL_data/', type=str)
+    parser.add_argument('--data_dir', default=r'/data/yfy/FD-data/RUL/RUL_ts', type=str)
     parser.add_argument('--dataset', type=str, default="RUL")
-    parser.add_argument('--data_name', type=int, default=[0],
+    parser.add_argument('--data_name', type=int, default=['PHM1'],
                         help='each index corresponds to a str in [PHM1, PHM2, PHM3, XJTU1, XJTU2]')
     parser.add_argument('--algorithm', type=str, default="FC")
     parser.add_argument('--task', type=str, default="domain_generalization",
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                         help='Number of steps. Default is dataset-dependent.')
     parser.add_argument('--checkpoint_freq', type=int, default=None,
                         help='Checkpoint every N steps. Default is dataset-dependent.')
-    parser.add_argument('--test_envs', type=int, nargs='+', default=[1])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
+    parser.add_argument('--test_envs', type=int, nargs='+', default=['XJTU1'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
     parser.add_argument('--output_dir', type=str, default="train_output")
     parser.add_argument('--holdout_fraction', type=float, default=0.2)
     parser.add_argument('--uda_holdout_fraction', type=float, default=0,
@@ -120,65 +120,41 @@ if __name__ == "__main__":
             # train_x, train_y, tr_num = dataset.construct_domain()
             # train_x, train_y, tr_num = dataset.cwru_domain()
             # train_x, train_y, tr_num = dataset.pu_domain()
-            train_x, train_y, tr_num = dataset.get_domains()
+            # train_x, train_y, tr_num = dataset.get_domains()
+            train_x, train_y, tr_num = dataset.load_domains()
 
             rate = args.holdout_fraction
             in_splits, te_splits, mtedatalist, out_splits = [], [], [], []
 
             # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
-            if args.data_name == args.test_envs:
-                tr_index = {str(i): [0, 1, 2, 3, 4] for i in args.data_name}  # range(len(train_x[i]))
-                te_index = {str(i): [5, 6] for i in args.test_envs}
-            # else:
-            #     r_num = [i for i in range(len(train_x[str(0)]))]
-            #     e_num = [i for i in range(len(train_x[str(len(args.data_name))]))]
-            #     tr_index = {str(i): r_num for i in args.data_name}  # range(len(train_x[i]))
-            #     te_index = {str(i): e_num for i in args.test_envs}
+            # if args.data_name == args.test_envs:
+            tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
+            te_index = {i: [0, 1] for i in args.test_envs}  # TODO: datasets.py还是需要传入对应数据名
 
-                for k, v in tr_index.items():
-                    for i in v:
-                        te_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
+            for k, v in te_index.items():
+                for i in v:
+                    te_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
 
-                for k, v in te_index.items():
-                    for i in v:
-                        tmpdatay = DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]).labels
-                        l = len(tmpdatay)
+            for k, v in tr_index.items():
+                for i in v:
+                    tmpdatay = DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]).labels
+                    l = len(tmpdatay)
 
-                        lslist = np.arange(l)
-                        stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
-                                                            random_state=args.seed)  # 划分训练/验证集
-                        stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
-                        indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
-                        np.random.seed(args.seed)
-                        indexmte = np.random.permutation(indextr)
+                    lslist = np.arange(l)
+                    stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
+                                                        random_state=args.seed)  # 划分训练/验证集
+                    stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
+                    indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
+                    np.random.seed(args.seed)
+                    indexmte = np.random.permutation(indextr)
 
-                        in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                                      indices=indextr))
-                        mtedatalist.append(
-                            DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                         indices=indexmte))
-                        out_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                                       indices=indexval))
-            else:
-                for i in range(tr_num):
-                    if i in args.test_envs:
-                        for j in range(len(train_x[str(i)])):
-                            te_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][j], labels=train_y[str(i)][j]))
-                    else:
-                        for k in range(len(train_x[str(i)])):
-                            tmpdatay = DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k]).labels
-                            l = len(tmpdatay)
-
-                            lslist = np.arange(l)
-                            stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate, random_state=args.seed)  # 划分训练/验证集
-                            stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
-                            indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
-                            np.random.seed(args.seed)
-                            indexmte = np.random.permutation(indextr)
-
-                            in_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k], indices=indextr))
-                            mtedatalist.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k], indices=indexmte))
-                            out_splits.append(DataGenerate(args=args, domain_data=train_x[str(i)][k], labels=train_y[str(i)][k], indices=indexval))
+                    in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                                                  indices=indextr))
+                    mtedatalist.append(
+                        DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                                     indices=indexmte))
+                    out_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                                                   indices=indexval))
 
             train_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
                 dataset=env,
@@ -220,9 +196,10 @@ if __name__ == "__main__":
                                   for i in range(len(out_splits))]
             eval_loader_names += ['env{}_test'.format(i)
                                   for i in range(len(te_splits))]
+            domain_num = len(in_splits)
             # eval_loader_names += ['env{}_test'.format(i)
             #                       for i in args.test_envs]
-            domain_num = tr_num - len(args.test_envs)
+            # domain_num = tr_num - len(args.test_envs)
 
         algorithm_class = algorithms.get_algorithm_class(args.algorithm)    # 算法实例化
         algorithm = algorithm_class(dataset.input_shape, dataset.num_classes, domain_num, hparams)  # 算法初始化：模型、优化器

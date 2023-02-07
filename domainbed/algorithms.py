@@ -98,6 +98,16 @@ class ERM(Algorithm):
                                   hparams)
         if len(input_shape) == 2:
             self.featurizer = networks.CNN(pretrained=False, in_channel=input_shape[0], out_channel=num_classes)
+            # self.featurizer = networks.TSCP(input_size=1,
+            #                                 output_size=5,
+            #                                 num_channels=[1, 32, 64],
+            #                                 hidden_dim=100,
+            #                                 kernel_size=4,
+            #                                 dropout=False,
+            #                                 batch_norm=True,
+            #                                 attention=False,
+            #                                 non_linear='relu',
+            #                                 )
             self.classifier = networks.classifier_homo(self.featurizer.n_outputs, num_classes)
         else:
             self.featurizer = networks.Featurizer(input_shape, self.hparams)  # (224,224): ResNet50, output_size=2048

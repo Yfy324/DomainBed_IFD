@@ -647,18 +647,20 @@ class Bearing(object):
 
 
 class RUL(object):
-    N_STEPS = 4001  #851 Default, subclasses may override
+    N_STEPS = 601  #851 Default, subclasses may override
     CHECKPOINT_FREQ = 50  # Default, subclasses may override
     N_WORKERS = 8  # Default, subclasses may override
     ENVIRONMENTS = ['PHM1', 'PHM2', 'PHM3', 'XJTU1', 'XJTU2']  # Subclasses should override
-    INPUT_SHAPE = (1, 100)  # Subclasses should override
+    INPUT_SHAPE = (2, 2560)  # Subclasses should override
 
     def __init__(self, data_dir, dataname, test_envs):
-        self.input_shape = (1, 100)
+        self.input_shape = (2, 2560)
         self.num_classes = 2
         self.dir = data_dir
-        self.train = [RUL.ENVIRONMENTS[i] for i in dataname]
-        self.test = [RUL.ENVIRONMENTS[i] for i in test_envs]
+        # self.train = [RUL.ENVIRONMENTS[i] for i in dataname]
+        # self.test = [RUL.ENVIRONMENTS[i] for i in test_envs]
+        self.train = dataname
+        self.test = test_envs
         self.domain_num = len(dataname)
 
     def get_domains(self):
@@ -672,5 +674,19 @@ class RUL(object):
             tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train).get_data()
         else:
             tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train+self.test).get_data()
+
+        return tr_x, tr_y, tr_n
+
+    def load_domains(self):
+
+        print("Load Data.")
+
+        print('Train data: ', self.train)
+        print('Test data: ', self.test)
+
+        if self.train == self.test:
+            tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train).load_data()
+        else:
+            tr_x, tr_y, tr_n = BearingRUL(self.dir, self.train+self.test).load_data()
 
         return tr_x, tr_y, tr_n

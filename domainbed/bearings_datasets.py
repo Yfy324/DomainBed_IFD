@@ -1301,19 +1301,41 @@ class BearingRUL(object):
         bearing_names.sort()
         bearing_data = {}
         bearing_lab = {}
-        count = 0
+        # count = 0
         for i in self.name:
-            bearing_data[str(count)] = []
-            bearing_lab[str(count)] = []
+            bearing_data[i] = []
+            bearing_lab[i] = []
             for j in bearing_names:
                 if i in j:
                     data = pd.read_csv(os.path.join(self.dir, j), header=None)
                     data = np.array(data).reshape(data.shape[0], 1, -1)
                     # np.expand_dims(data, axis=1)
-                    bearing_data[str(count)].append(data[:, :, :-1])
-                    bearing_lab[str(count)].append(data[:, :, -1].reshape(-1))
+                    bearing_data[i].append(data[:, :, :-1])
+                    bearing_lab[i].append(data[:, :, -1].reshape(-1))
 
-            count += 1
+            # count += 1
+
+        return bearing_data, bearing_lab, len(self.name)
+
+    def load_data(self):
+        # dir = r'/data/yfy/FD-data/RUL/phm_dict.npy'
+        # data = np.load(dir, allow_pickle=True).item() # (time-steps, 2560, 2)
+        bearing_data = {}
+        bearing_lab = {}
+        # count = 0
+        y = np.load(os.path.join(self.dir, 'labels.npy'), allow_pickle=True).item()
+        for i in self.name:
+            bearing_data[i] = []
+            bearing_lab[i] = []
+            x = np.load(os.path.join(self.dir, i+'.npy'), allow_pickle=True).item()
+            for k, v in x.items():
+                bearing_data[i].append(v.transpose(0, 2, 1))
+
+            for j, v1 in y.items():
+                if i in j:
+                    bearing_lab[i].append(v1)
+
+                # count += 1
 
         return bearing_data, bearing_lab, len(self.name)
 
