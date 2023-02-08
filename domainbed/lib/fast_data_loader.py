@@ -39,6 +39,7 @@ class InfiniteDataLoader:
             dataset,
             num_workers=num_workers,
             batch_sampler=_InfiniteSampler(batch_sampler),
+            shuffle=False
         ))
 
     def __iter__(self):
@@ -65,7 +66,7 @@ class FastDataLoader:
         self._infinite_iterator = iter(torch.utils.data.DataLoader(
             dataset,
             num_workers=num_workers,
-            batch_sampler=_InfiniteSampler(batch_sampler)
+            batch_sampler=_InfiniteSampler(batch_sampler),
         ))
 
         self._length = len(batch_sampler)

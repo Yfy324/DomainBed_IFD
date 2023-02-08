@@ -29,6 +29,7 @@ from visdom import Visdom
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Domain generalization')
+    parser.add_argument('--train', default=False, type=bool)
     parser.add_argument('--data_dir', default=r'/data/yfy/FD-data/RUL/RUL_ts', type=str)
     parser.add_argument('--dataset', type=str, default="RUL")
     parser.add_argument('--data_name', type=int, default=['PHM1'],
@@ -81,134 +82,139 @@ if __name__ == "__main__":
     # print("\tNumPy: {}".format(np.__version__))
     # print("\tPIL: {}".format(PIL.__version__))
 
-    for trails in range(1):
-        print("trails:", trails)
-        print('Args:')
-        for k, v in sorted(vars(args).items()):
-            print('\t{}: {}'.format(k, v))
+    # for trails in range(1):
+    #     print("trails:", trails)
+    print('Args:')
+    for k, v in sorted(vars(args).items()):
+        print('\t{}: {}'.format(k, v))
 
-        if args.hparams_seed == 0:
-            hparams = hparams_registry.default_hparams(args.algorithm, args.dataset)   # 根据算法、数据集 设定超参数
-        else:
-            hparams = hparams_registry.random_hparams(args.algorithm, args.dataset,
-                                                      misc.seed_hash(args.hparams_seed, args.trial_seed))
-        if args.hparams:
-            hparams.update(json.loads(args.hparams))
+    if args.hparams_seed == 0:
+        hparams = hparams_registry.default_hparams(args.algorithm, args.dataset)   # 根据算法、数据集 设定超参数
+    else:
+        hparams = hparams_registry.random_hparams(args.algorithm, args.dataset,
+                                                  misc.seed_hash(args.hparams_seed, args.trial_seed))
+    if args.hparams:
+        hparams.update(json.loads(args.hparams))
 
-        print('HParams:')
-        for k, v in sorted(hparams.items()):
-            print('\t{}: {}'.format(k, v))
+    print('HParams:')
+    for k, v in sorted(hparams.items()):
+        print('\t{}: {}'.format(k, v))
 
-        random.seed(args.seed)   # 固定影响随机数的参数
-        np.random.seed(args.seed)
-        torch.manual_seed(args.seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+    random.seed(args.seed)   # 固定影响随机数的参数
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
-        if torch.cuda.is_available():
-            device = "cuda"
-        else:
-            device = "cpu"
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
 
-        if args.dataset != 'RUL':
-            pass
-        else:
-            dataset = vars(datasets)[args.dataset](args.data_dir, args.data_name,
-                                                   args.test_envs,
-                                                   # hparams
-                                                   )
-            # train_x, train_y, tr_num = dataset.construct_domain()
-            # train_x, train_y, tr_num = dataset.cwru_domain()
-            # train_x, train_y, tr_num = dataset.pu_domain()
-            # train_x, train_y, tr_num = dataset.get_domains()
-            train_x, train_y, tr_num = dataset.load_domains()
+    if args.dataset != 'RUL':
+        pass
+    else:
+        dataset = vars(datasets)[args.dataset](args.data_dir, args.data_name,
+                                               args.test_envs,
+                                               # hparams
+                                               )
+        # train_x, train_y, tr_num = dataset.construct_domain()
+        # train_x, train_y, tr_num = dataset.cwru_domain()
+        # train_x, train_y, tr_num = dataset.pu_domain()
+        # train_x, train_y, tr_num = dataset.get_domains()
+        train_x, train_y, tr_num = dataset.load_domains()
 
-            rate = args.holdout_fraction
-            in_splits, te_splits, mtedatalist, out_splits = [], [], [], []
+        rate = args.holdout_fraction
+        in_splits, te_splits, mtedatalist, out_splits = [], [], [], []
 
-            # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
-            # if args.data_name == args.test_envs:
-            tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
-            te_index = {i: [0, 1] for i in args.test_envs}  # TODO: datasets.py还是需要传入对应数据名
+        # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
+        # if args.data_name == args.test_envs:
+        tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
+        te_index = {i: [0, 1] for i in args.test_envs}  # TODO: datasets.py还是需要传入对应数据名
 
-            for k, v in te_index.items():
-                for i in v:
-                    te_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
+        for k, v in te_index.items():
+            for i in v:
+                te_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
 
-            for k, v in tr_index.items():
-                for i in v:
-                    tmpdatay = DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]).labels
-                    l = len(tmpdatay)
+        for k, v in tr_index.items():
+            for i in v:
+                # in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
+                tmpdatay = DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]).labels
+                l = len(tmpdatay)
 
-                    lslist = np.arange(l)
-                    stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
-                                                        random_state=args.seed)  # 划分训练/验证集
-                    stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
-                    indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
-                    np.random.seed(args.seed)
-                    indexmte = np.random.permutation(indextr)
+                lslist = np.arange(l)
+                stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
+                                                    random_state=args.seed)  # 划分训练/验证集
+                stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
+                indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
+                # np.random.seed(args.seed)
+                indextr = np.sort(indextr, axis=0)
+                indexval = np.sort(indexval, axis=0)
+                # indexmte = np.random.permutation(indextr)
+                # indexmte = np.sort(indexmte, axis=0)
 
-                    in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                                  indices=indextr))
-                    mtedatalist.append(
-                        DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                     indices=indexmte))
-                    out_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                                   indices=indexval))
+                in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                                              indices=indextr))
+                # mtedatalist.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                #                  indices=indexmte))
+                out_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                                               indices=indexval))
 
-            train_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
-                dataset=env,
-                weights=None,
-                batch_size=hparams['batch_size'],
-                num_workers=dataset.N_WORKERS)
-                for env in in_splits]
+        train_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
+            dataset=env,
+            weights=None,
+            batch_size=hparams['batch_size'],
+            num_workers=dataset.N_WORKERS)
+            for env in in_splits]
 
-            meta_test_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
-                dataset=env,
-                weights=None,
-                batch_size=hparams['batch_size'],
-                num_workers=dataset.N_WORKERS)
-                for env in mtedatalist]
+        meta_test_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
+            dataset=env,
+            weights=None,
+            batch_size=hparams['batch_size'],
+            num_workers=dataset.N_WORKERS)
+            for env in in_splits]
 
-            eval_loaders = [DataLoader(
-                dataset=env,
-                batch_size=hparams['batch_size'],
-                num_workers=dataset.N_WORKERS,
-                drop_last=False,
-                shuffle=False
-            )
-                for env in (in_splits + out_splits + te_splits)]
+        eval_loaders = [DataLoader(
+            dataset=env,
+            batch_size=hparams['batch_size'],
+            num_workers=dataset.N_WORKERS,
+            drop_last=False,
+            shuffle=False
+        )
+            for env in (in_splits + out_splits + te_splits)]
 
-            test_loaders = [DataLoader(
-                dataset=env,
-                batch_size=hparams['batch_size'],
-                num_workers=dataset.N_WORKERS,
-                drop_last=False,
-                shuffle=False
-            )
-                for env in te_splits]
-            uda_loaders = []
+        test_loaders = [DataLoader(
+            dataset=env,
+            batch_size=hparams['batch_size'],
+            num_workers=dataset.N_WORKERS,
+            drop_last=False,
+            shuffle=False
+        )
+            for env in te_splits]
 
-            eval_weights = [None] * (len(in_splits) + len(out_splits) + len(te_splits))
-            eval_loader_names = ['env{}_in'.format(i)
-                                 for i in range(len(in_splits))]
-            eval_loader_names += ['env{}_out'.format(i)
-                                  for i in range(len(out_splits))]
-            eval_loader_names += ['env{}_test'.format(i)
-                                  for i in range(len(te_splits))]
-            domain_num = len(in_splits)
-            # eval_loader_names += ['env{}_test'.format(i)
-            #                       for i in args.test_envs]
-            # domain_num = tr_num - len(args.test_envs)
+        uda_loaders = []
 
-        algorithm_class = algorithms.get_algorithm_class(args.algorithm)    # 算法实例化
-        algorithm = algorithm_class(dataset.input_shape, dataset.num_classes, domain_num, hparams)  # 算法初始化：模型、优化器
+        eval_weights = [None] * (len(in_splits) + len(out_splits) + len(te_splits))
+        eval_loader_names = ['env{}_in'.format(i)
+                             for i in range(len(in_splits))]
+        eval_loader_names += ['env{}_out'.format(i)
+                              for i in range(len(out_splits))]
+        eval_loader_names += ['env{}_test'.format(i)
+                              for i in range(len(te_splits))]
+        domain_num = len(in_splits)
+        # eval_loader_names += ['env{}_test'.format(i)
+        #                       for i in args.test_envs]
+        # domain_num = tr_num - len(args.test_envs)
 
-        if algorithm_dict is not None:
-            algorithm.load_state_dict(algorithm_dict)
+    algorithm_class = algorithms.get_algorithm_class(args.algorithm)    # 算法实例化
+    algorithm = algorithm_class(dataset.input_shape, dataset.num_classes, domain_num, hparams)  # 模型、优化器初始化 network
 
-        algorithm.to(device)
+    if algorithm_dict is not None:
+        algorithm.load_state_dict(algorithm_dict)
 
+    algorithm.to(device)
+
+    if args.train:
         train_minibatches_iterator = zip(*train_loaders)
         uda_minibatches_iterator = zip(*uda_loaders)
         checkpoint_vals = collections.defaultdict(lambda: [])  # defaultdict用法 https://blog.csdn.net/weixin_42160653/article/details/80297894
@@ -302,13 +308,34 @@ if __name__ == "__main__":
                 if args.save_model_every_checkpoint:
                     save_checkpoint(f'model_step{step}.pkl')
 
+        critic = misc.Fpr(device)
+        for loader in test_loaders:
+            score, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            location = np.where(score == 1)[0][0]
+            print('fault location: ', location)
+            print('aupr: ', aupr)
+            print('auroc: ', auroc)
+            print('fpr95: ', fpr95)
+
         save_checkpoint('model.pkl')
 
         with open(os.path.join(args.output_dir, 'done'), 'w') as f:
             f.write('done')
 
-        start_step = 0
-        algorithm_dict = None
+        # start_step = 0
+        # algorithm_dict = None
 
+    else:
+        model_dir = r'/home/yfy/IFD/DomainBed-IFD/domainbed/scripts/train_output/model.pkl'
+        model_dict = torch.load(model_dir)["model_dict"]
+        algorithm.load_state_dict(state_dict=model_dict)
+        critic = misc.Fpr(device)
+        for loader in train_loaders:
+            score, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            location = np.where(score == 1)[0][0]
+            print('fault location: ', location)
+            print('aupr: ', aupr)
+            print('auroc: ', auroc)
+            print('fpr95: ', fpr95)
 
 
