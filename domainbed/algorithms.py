@@ -74,7 +74,7 @@ class Algorithm(torch.nn.Module):
         super(Algorithm, self).__init__()
         self.hparams = hparams
 
-    def update(self, minibatches, unlabeled=None):
+    def update(self, minibatches, location, unlabeled=None):
         """
         Perform one update step, given a list of (x, y) tuples for all
         environments.
@@ -123,10 +123,18 @@ class ERM(Algorithm):
             weight_decay=self.hparams['weight_decay']
         )
 
-    def update(self, minibatches, unlabeled=None):
-        all_x = torch.cat([x for x, y in minibatches])
-        all_y = torch.cat([y for x, y in minibatches]).long()
-        loss = F.cross_entropy(self.predict(all_x), all_y)   # ARM在predict处不同，输出也不同
+    def update(self, minibatches, location, unlabeled=None):
+        # all_x = torch.cat([x for x, y, ind in minibatches])
+        # all_y = torch.cat([y for x, y, ind in minibatches]).long()
+        # loss = F.cross_entropy(self.predict(all_x), all_y)  # ARM在predict处不同，输出也不同
+        loss = 0.
+        l = 0
+        for x, y, ind in minibatches:
+            pred = self.predict(x)
+            score = np.argmax(pred.cpu().detach().numpy(), axis=-1)
+            loc = location[l] - ind[np.where(score == 1)[0][0]] if ind[0]<=location[l] else 0
+            loss = F.cross_entropy(self.predict(x), y) + 0.01
+            l += 1
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -1006,7 +1014,7 @@ class SD(ERM):
 
     def update(self, minibatches, unlabeled=None):
         all_x = torch.cat([x for x, y in minibatches])
-        all_y = torch.cat([y for x, y in minibatches])
+        all_y = torch.cat([y for x, y in minibatches]).long()
         all_p = self.predict(all_x)
 
         loss = F.cross_entropy(all_p, all_y)

@@ -647,7 +647,7 @@ class Bearing(object):
 
 
 class RUL(object):
-    N_STEPS = 601  # 851 Default, subclasses may override
+    N_STEPS = 2601  # 851 Default, subclasses may override
     CHECKPOINT_FREQ = 50  # Default, subclasses may override
     N_WORKERS = 8  # Default, subclasses may override
     ENVIRONMENTS = ['PHM1', 'PHM2', 'PHM3', 'XJTU1', 'XJTU2']  # Subclasses should override

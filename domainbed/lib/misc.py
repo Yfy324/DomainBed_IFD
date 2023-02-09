@@ -17,9 +17,12 @@ import numpy as np
 import torch
 import tqdm
 from collections import Counter
-from sklearn.metrics import confusion_matrix, roc_auc_score, average_precision_score
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
+import faiss
+from sklearn.metrics import confusion_matrix, roc_auc_score, average_precision_score, accuracy_score
+import sklearn.metrics as skm
+from sklearn.covariance import ledoit_wolf
 
 
 def l2_between_dicts(dict_1, dict_2):
@@ -183,10 +186,11 @@ class Fpr(Critic):
                                'its last element does not correspond to sum')
         return out
 
-    def fpr_and_fdr_at_recall(self, y_true, y_score, recall_level, pos_label=None):
-        location = y_score
-        aupr = average_precision_score(y_true, y_score)
-        auroc = roc_auc_score(y_true, y_score)
+    def fpr_and_fdr_at_recall(self, y_pred, y_true, y_score, recall_level, pos_label=None):
+        # fpr, tpr, thresholds = roc_curve(y_true, y_score, pos_label=0)
+        locations = y_score
+        aupr = average_precision_score(y_true, y_pred)
+        auroc = roc_auc_score(y_true, y_pred)
         classes = np.unique(y_true)
         if (pos_label is None and
                 not (np.array_equal(classes, [0, 1]) or
@@ -225,8 +229,15 @@ class Fpr(Critic):
         recall, fps, tps, thresholds = np.r_[recall[sl], 1], np.r_[fps[sl], 0], np.r_[tps[sl], 0], thresholds[sl]  # 相同的softmax突变的地方 找fps、tps、对应的预测分
 
         cutoff = np.argmin(np.abs(recall - recall_level))  # 找到recall大于0.95对应的索引
+        location = np.where(locations > thresholds[cutoff])[0]
 
         return location, aupr, auroc, fps[cutoff] / (np.sum(np.logical_not(y_true)))  # fps[cutoff]/(fps[cutoff] + tps[cutoff]) 计算recall=0.95是对应的fps
+
+    def get_score(self, model_output):
+        to_np = lambda x: x.data.cpu().numpy()
+        score = to_np(F.softmax(model_output, dim=1))  # 按行softmax，保证行和为1 (第1维度进行归一化)
+        score = np.max(score, axis=1)  # 保存的是每个预测最大的softmax score，而不是预测的标签
+        return score
 
     def evaluate(self, network, loader):
         network.eval()
@@ -235,9 +246,157 @@ class Fpr(Critic):
             all_y = torch.cat([y for x, y, ind in loader]).to(self.device)
             all_p = network.predict(all_x)
             y_true = all_y.cpu().numpy()
-            y_score = np.argmax(all_p.cpu().numpy(), axis=-1)
+            y_pred = np.argmax(all_p.cpu().numpy(), axis=-1)
+            y_score = self.get_score(all_p)
         network.train()
-        return self.fpr_and_fdr_at_recall(y_true, y_score, self.recall_level)
+        return self.fpr_and_fdr_at_recall(y_pred, y_true, y_score, self.recall_level)
+
+
+class SSD_score():
+    def __init__(self):
+        pass
+
+    def get_roc_sklearn(self, xin, xood):
+        labels = [0] * len(xin) + [1] * len(xood)
+        data = np.concatenate((xin, xood))
+        auroc = skm.roc_auc_score(labels, data)
+        return auroc
+
+    def get_pr_sklearn(self, xin, xood):
+        labels = [0] * len(xin) + [1] * len(xood)
+        data = np.concatenate((xin, xood))
+        aupr = skm.average_precision_score(labels, data)
+        return aupr
+
+    def get_fpr(self, xin, xood):
+        return np.sum(xood < np.percentile(xin, 95)) / len(xood)  # percentile：0-100的几分位，50 == 中位数
+
+    def get_scores_one_cluster(self, ftrain, ftest, food, shrunkcov=False):
+        if shrunkcov:
+            print("Using ledoit-wolf covariance estimator.")
+            cov = lambda x: ledoit_wolf(x)[0]
+        else:
+            cov = lambda x: np.cov(x.T, bias=True)  # 协方差计算，转置：每一行表示一个特征，每列表示不同特征的取值
+
+        # ToDO: Simplify these equations
+        dtest = np.sum(
+            (ftest - np.mean(ftrain, axis=0, keepdims=True))
+            * (
+                np.linalg.pinv(cov(ftrain)).dot(
+                    (ftest - np.mean(ftrain, axis=0, keepdims=True)).T
+                )
+            ).T,
+            axis=-1,
+        )
+
+        dood = np.sum(
+            (food - np.mean(ftrain, axis=0, keepdims=True))
+            * (
+                np.linalg.pinv(cov(ftrain)).dot(
+                    (food - np.mean(ftrain, axis=0, keepdims=True)).T
+                )
+            ).T,
+            axis=-1,
+        )
+
+        return dtest, dood
+
+    def get_scores(self, ftrain, ftest, food, labelstrain, args):
+        if args.clusters == 1:
+            return self.get_scores_one_cluster(ftrain, ftest, food)
+        else:
+            if args.training_mode == "SupCE":
+                print("Using data labels as cluster since model is cross-entropy")
+                ypred = labelstrain
+            else:
+                ypred = self.get_clusters(ftrain, args.clusters)
+            return self.get_scores_multi_cluster(ftrain, ftest, food, ypred)
+
+    def get_clusters(self, ftrain, nclusters):
+        kmeans = faiss.Kmeans(
+            ftrain.shape[1], nclusters, niter=100, verbose=False, gpu=False
+        )
+        kmeans.train(np.random.permutation(ftrain))
+        _, ypred = kmeans.assign(ftrain)
+        return ypred
+
+    def get_scores_multi_cluster(self, ftrain, ftest, food, ypred):
+        xc = [ftrain[ypred == i] for i in np.unique(ypred)]
+
+        din = [
+            np.sum(
+                (ftest - np.mean(x, axis=0, keepdims=True))
+                * (
+                    np.linalg.pinv(np.cov(x.T, bias=True)).dot(
+                        (ftest - np.mean(x, axis=0, keepdims=True)).T
+                    )  # linalg.pinv 求伪逆
+                ).T,
+                axis=-1,
+            )
+            for x in xc
+        ]
+        dood = [
+            np.sum(
+                (food - np.mean(x, axis=0, keepdims=True))
+                * (
+                    np.linalg.pinv(np.cov(x.T, bias=True)).dot(
+                        (food - np.mean(x, axis=0, keepdims=True)).T
+                    )
+                ).T,
+                axis=-1,
+            )
+            for x in xc
+        ]
+
+        din = np.min(din, axis=0)
+        dood = np.min(dood, axis=0)
+
+        return din, dood
+
+    def get_eval_results(self, ftrain, ftest, food, labelstrain, args):
+        """
+        None.
+        """
+        # standardize data
+        ftrain /= np.linalg.norm(ftrain, axis=-1, keepdims=True) + 1e-10  # 求多个行向量的范数，然后归一化
+        ftest /= np.linalg.norm(ftest, axis=-1, keepdims=True) + 1e-10
+        food /= np.linalg.norm(food, axis=-1, keepdims=True) + 1e-10
+
+        m, s = np.mean(ftrain, axis=0, keepdims=True), np.std(ftrain, axis=0, keepdims=True)
+
+        ftrain = (ftrain - m) / (s + 1e-10)  # M-距离
+        ftest = (ftest - m) / (s + 1e-10)
+        food = (food - m) / (s + 1e-10)
+
+        dtest, dood = self.get_scores(ftrain, ftest, food, labelstrain, args)
+
+        fpr95 = self.get_fpr(dtest, dood)  # TPR＝95%时，对应的FPR，以in-test为标的
+        auroc, aupr = self.get_roc_sklearn(dtest, dood), self.get_pr_sklearn(dtest, dood)  # AUROC面积，平均precision
+        return fpr95, auroc, aupr
+
+
+def get_features(network, dataloader, max_images=10 ** 10, verbose=False):
+    features, labels = [], []
+    total = 0
+
+    network.eval()
+
+    for index, (img, label) in enumerate(dataloader):
+
+        if total > max_images:
+            break
+
+        img, label = img.cuda(), label.cuda()
+
+        features += list(network.featurizer(img).data.cpu().numpy())
+        labels += list(label.data.cpu().numpy())
+
+        if verbose and not index % 50:
+            print(index)
+
+        total += len(img)
+
+    return np.array(features), np.array(labels)
 
 
 def random_pairs_of_minibatches(minibatches):
@@ -257,7 +416,7 @@ def random_pairs_of_minibatches(minibatches):
     return pairs
 
 
-def accuracy(network, loader, weights, device):
+def weight_accuracy(network, loader, weights, device):
     correct = 0
     total = 0
     weights_offset = 0
@@ -284,6 +443,20 @@ def accuracy(network, loader, weights, device):
 
     return correct / total
 
+
+def accuracy(network, loader, weights, device):
+    network.eval()
+    with torch.no_grad():
+        all_x = torch.cat([x for x, y, ind in loader]).to(device)
+        all_y = torch.cat([y for x, y, ind in loader]).to(device)
+        all_p = network.predict(all_x)
+        y_true = all_y.cpu().numpy()
+        y_pred = np.argmax(all_p.cpu().numpy(), axis=-1)
+        accuracy = accuracy_score(y_true, y_pred)
+        location = np.where(y_true == 1)[0][0] - np.where(y_pred == 1)[0][0] + 0.
+
+    network.train()
+    return accuracy, location
 
 def cm2(loader, network, device):
     network.eval()

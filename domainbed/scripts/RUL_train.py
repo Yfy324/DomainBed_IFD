@@ -29,12 +29,12 @@ from visdom import Visdom
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Domain generalization')
-    parser.add_argument('--train', default=False, type=bool)
+    parser.add_argument('--train', default=True, type=bool)
     parser.add_argument('--data_dir', default=r'/data/yfy/FD-data/RUL/RUL_ts', type=str)
     parser.add_argument('--dataset', type=str, default="RUL")
     parser.add_argument('--data_name', type=int, default=['PHM1'],
                         help='each index corresponds to a str in [PHM1, PHM2, PHM3, XJTU1, XJTU2]')
-    parser.add_argument('--algorithm', type=str, default="FC")
+    parser.add_argument('--algorithm', type=str, default="ERM")
     parser.add_argument('--task', type=str, default="domain_generalization",
                         choices=["domain_generalization", "domain_adaptation"])
     parser.add_argument('--hparams', type=str,
@@ -114,6 +114,12 @@ if __name__ == "__main__":
     if args.dataset != 'RUL':
         pass
     else:
+        RUL_dict = {'PHM1': [1006, 641, 990, 832, 1192, 858, 978],
+                    'PHM2': [114, 160, 251, 269, 965, 325, 120],
+                    'PHM3': [490, 1442],
+                    'XJTU1': [850, 501, 714, 988, 407],
+                    'XJTU2': [5310, 553, 3365, 361, 1436],
+                    }
         dataset = vars(datasets)[args.dataset](args.data_dir, args.data_name,
                                                args.test_envs,
                                                # hparams
@@ -125,12 +131,14 @@ if __name__ == "__main__":
         train_x, train_y, tr_num = dataset.load_domains()
 
         rate = args.holdout_fraction
-        in_splits, te_splits, mtedatalist, out_splits = [], [], [], []
+        in_splits, te_splits, tr_splits, out_splits = [], [], [], []
 
         # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
         # if args.data_name == args.test_envs:
         tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
-        te_index = {i: [0, 1] for i in args.test_envs}  # TODO: datasets.py还是需要传入对应数据名
+        te_index = {i: [0, 1] for i in args.test_envs}
+
+        tr_loc = RUL_dict[args.data_name][tr_index[args.data_name]]
 
         for k, v in te_index.items():
             for i in v:
@@ -138,41 +146,42 @@ if __name__ == "__main__":
 
         for k, v in tr_index.items():
             for i in v:
-                # in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
-                tmpdatay = DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]).labels
-                l = len(tmpdatay)
-
-                lslist = np.arange(l)
-                stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
-                                                    random_state=args.seed)  # 划分训练/验证集
-                stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
-                indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
-                # np.random.seed(args.seed)
-                indextr = np.sort(indextr, axis=0)
-                indexval = np.sort(indexval, axis=0)
-                # indexmte = np.random.permutation(indextr)
-                # indexmte = np.sort(indexmte, axis=0)
-
-                in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                              indices=indextr))
-                # mtedatalist.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                #                  indices=indexmte))
-                out_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
-                                               indices=indexval))
+                tr_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]))
+                in_splits = tr_splits
+                # tmpdatay = DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i]).labels
+                # l = len(tmpdatay)
+                #
+                # lslist = np.arange(l)
+                # stsplit = ms.StratifiedShuffleSplit(2, test_size=rate, train_size=1 - rate,
+                #                                     random_state=args.seed)  # 划分训练/验证集
+                # stsplit.get_n_splits(lslist, tmpdatay)  # 返回n_splits
+                # indextr, indexval = next(stsplit.split(lslist, tmpdatay))  # (数字索引，对应标签)，划分2组，交叉验证
+                # # np.random.seed(args.seed)
+                # indextr = np.sort(indextr, axis=0)
+                # indexval = np.sort(indexval, axis=0)
+                # # indexmte = np.random.permutation(indextr)
+                # # indexmte = np.sort(indexmte, axis=0)
+                #
+                # in_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                #                               indices=indextr))
+                # # mtedatalist.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                # #                  indices=indexmte))
+                # out_splits.append(DataGenerate(args=args, domain_data=train_x[k][i], labels=train_y[k][i],
+                #                                indices=indexval))
 
         train_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
             dataset=env,
             weights=None,
             batch_size=hparams['batch_size'],
             num_workers=dataset.N_WORKERS)
-            for env in in_splits]
+            for env in in_splits] # in
 
         meta_test_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
             dataset=env,
             weights=None,
             batch_size=hparams['batch_size'],
             num_workers=dataset.N_WORKERS)
-            for env in in_splits]
+            for env in in_splits]  # in
 
         eval_loaders = [DataLoader(
             dataset=env,
@@ -181,7 +190,8 @@ if __name__ == "__main__":
             drop_last=False,
             shuffle=False
         )
-            for env in (in_splits + out_splits + te_splits)]
+            # for env in (in_splits + out_splits + te_splits)]
+            for env in (tr_splits + te_splits)]
 
         test_loaders = [DataLoader(
             dataset=env,
@@ -192,13 +202,26 @@ if __name__ == "__main__":
         )
             for env in te_splits]
 
+        tr_loaders = [DataLoader(
+            dataset=env,
+            batch_size=hparams['batch_size'],
+            num_workers=dataset.N_WORKERS,
+            drop_last=False,
+            shuffle=False
+        )
+            for env in tr_splits]
+
         uda_loaders = []
 
-        eval_weights = [None] * (len(in_splits) + len(out_splits) + len(te_splits))
+        # eval_weights = [None] * (len(in_splits) + len(out_splits) + len(te_splits))
+        # eval_loader_names = ['env{}_in'.format(i)
+        #                      for i in range(len(in_splits))]
+        # eval_loader_names += ['env{}_out'.format(i)
+        #                       for i in range(len(out_splits))]
+        eval_weights = [None] * (len(tr_splits) + len(te_splits))
+
         eval_loader_names = ['env{}_in'.format(i)
-                             for i in range(len(in_splits))]
-        eval_loader_names += ['env{}_out'.format(i)
-                              for i in range(len(out_splits))]
+                             for i in range(len(tr_splits))]
         eval_loader_names += ['env{}_test'.format(i)
                               for i in range(len(te_splits))]
         domain_num = len(in_splits)
@@ -243,14 +266,14 @@ if __name__ == "__main__":
         last_results_keys = None
         for step in range(start_step, n_steps):
             step_start_time = time.time()
-            minibatches_device = [(x.to(device), y.to(device))
+            minibatches_device = [(x.to(device), y.to(device), ind.to(device))
                                   for x, y, ind in next(train_minibatches_iterator)]
             if args.task == "domain_adaptation":
                 uda_device = [x.to(device)
                               for x, _ in next(uda_minibatches_iterator)]
             else:
                 uda_device = None
-            step_vals = algorithm.update(minibatches_device, uda_device)   # 返回的是loss 字典
+            step_vals = algorithm.update(minibatches_device, tr_loc, uda_device)   # 返回的是loss 字典
             checkpoint_vals['step_time'].append(time.time() - step_start_time)
 
             for key, val in step_vals.items():
@@ -273,9 +296,10 @@ if __name__ == "__main__":
                 results['average_acc'], count = 0, 0
                 evals = zip(eval_loader_names, eval_loaders, eval_weights)
                 for name, loader, weights in evals:
-                    acc = misc.accuracy(algorithm, loader, weights, device)
+                    acc, loc = misc.accuracy(algorithm, loader, weights, device)
                     # TODO: draw the confusion matrix cm2
                     results[name + '_acc'] = acc
+                    results[name + '_loc'] = loc
                     if 'test' in name:
                         results['average_acc'] += acc
                         count += 1
@@ -330,10 +354,10 @@ if __name__ == "__main__":
         model_dict = torch.load(model_dir)["model_dict"]
         algorithm.load_state_dict(state_dict=model_dict)
         critic = misc.Fpr(device)
-        for loader in train_loaders:
-            score, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
-            location = np.where(score == 1)[0][0]
-            print('fault location: ', location)
+        for loader in test_loaders:
+            location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            # location = np.where(score == 1)[0][0]
+            print('fault location: ', location[0])
             print('aupr: ', aupr)
             print('auroc: ', auroc)
             print('fpr95: ', fpr95)
