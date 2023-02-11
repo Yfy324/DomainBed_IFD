@@ -24,8 +24,8 @@ class InfiniteDataLoader:
                                                              replacement=True,
                                                              num_samples=batch_size)
         else:
-            sampler = torch.utils.data.RandomSampler(dataset,
-                                                     replacement=True)
+            sampler = torch.utils.data.RandomSampler(dataset, replacement=True)
+            # sampler = torch.utils.data.SequentialSampler(dataset)
 
         if weights == None:
             weights = torch.ones(len(dataset))

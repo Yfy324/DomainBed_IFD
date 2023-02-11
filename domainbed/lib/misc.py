@@ -229,7 +229,7 @@ class Fpr(Critic):
         recall, fps, tps, thresholds = np.r_[recall[sl], 1], np.r_[fps[sl], 0], np.r_[tps[sl], 0], thresholds[sl]  # 相同的softmax突变的地方 找fps、tps、对应的预测分
 
         cutoff = np.argmin(np.abs(recall - recall_level))  # 找到recall大于0.95对应的索引
-        location = np.where(locations > thresholds[cutoff])[0]
+        location = np.where(locations < thresholds[cutoff])[0]
 
         return location, aupr, auroc, fps[cutoff] / (np.sum(np.logical_not(y_true)))  # fps[cutoff]/(fps[cutoff] + tps[cutoff]) 计算recall=0.95是对应的fps
 
@@ -247,6 +247,8 @@ class Fpr(Critic):
             all_p = network.predict(all_x)
             y_true = all_y.cpu().numpy()
             y_pred = np.argmax(all_p.cpu().numpy(), axis=-1)
+            # fault = np.where(y_true == 1)[0][0]
+            # all_loc = range(all_x.shape[0])
             y_score = self.get_score(all_p)
         network.train()
         return self.fpr_and_fdr_at_recall(y_pred, y_true, y_score, self.recall_level)
@@ -302,7 +304,7 @@ class SSD_score():
         return dtest, dood
 
     def get_scores(self, ftrain, ftest, food, labelstrain, args):
-        if args.clusters == 1:
+        if args:  #.clusters == 1:
             return self.get_scores_one_cluster(ftrain, ftest, food)
         else:
             if args.training_mode == "SupCE":
@@ -310,7 +312,7 @@ class SSD_score():
                 ypred = labelstrain
             else:
                 ypred = self.get_clusters(ftrain, args.clusters)
-            return self.get_scores_multi_cluster(ftrain, ftest, food, ypred)
+            return self.get_scores_multi_cluster(ftrain, food, ypred)
 
     def get_clusters(self, ftrain, nclusters):
         kmeans = faiss.Kmeans(
@@ -320,21 +322,21 @@ class SSD_score():
         _, ypred = kmeans.assign(ftrain)
         return ypred
 
-    def get_scores_multi_cluster(self, ftrain, ftest, food, ypred):
+    def get_scores_multi_cluster(self, ftrain, food, ypred):
         xc = [ftrain[ypred == i] for i in np.unique(ypred)]
 
-        din = [
-            np.sum(
-                (ftest - np.mean(x, axis=0, keepdims=True))
-                * (
-                    np.linalg.pinv(np.cov(x.T, bias=True)).dot(
-                        (ftest - np.mean(x, axis=0, keepdims=True)).T
-                    )  # linalg.pinv 求伪逆
-                ).T,
-                axis=-1,
-            )
-            for x in xc
-        ]
+        # din = [
+        #     np.sum(
+        #         (ftest - np.mean(x, axis=0, keepdims=True))
+        #         * (
+        #             np.linalg.pinv(np.cov(x.T, bias=True)).dot(
+        #                 (ftest - np.mean(x, axis=0, keepdims=True)).T
+        #             )  # linalg.pinv 求伪逆
+        #         ).T,
+        #         axis=-1,
+        #     )
+        #     for x in xc
+        # ]
         dood = [
             np.sum(
                 (food - np.mean(x, axis=0, keepdims=True))
@@ -348,55 +350,68 @@ class SSD_score():
             for x in xc
         ]
 
-        din = np.min(din, axis=0)
+        # din = np.min(din, axis=0)
         dood = np.min(dood, axis=0)
 
-        return din, dood
+        return dood  # din, dood
 
-    def get_eval_results(self, ftrain, ftest, food, labelstrain, args):
+    def get_eval_results(self, ftrain, food, labelstrain, args):
         """
         None.
         """
         # standardize data
+        # ftrain = [i / np.linalg.norm(i, axis=-1, keepdims=True) + 1e-10 for i in ftrain]
         ftrain /= np.linalg.norm(ftrain, axis=-1, keepdims=True) + 1e-10  # 求多个行向量的范数，然后归一化
-        ftest /= np.linalg.norm(ftest, axis=-1, keepdims=True) + 1e-10
+        # ftest /= np.linalg.norm(ftest, axis=-1, keepdims=True) + 1e-10
         food /= np.linalg.norm(food, axis=-1, keepdims=True) + 1e-10
 
         m, s = np.mean(ftrain, axis=0, keepdims=True), np.std(ftrain, axis=0, keepdims=True)
 
         ftrain = (ftrain - m) / (s + 1e-10)  # M-距离
-        ftest = (ftest - m) / (s + 1e-10)
+        # ftest = (ftest - m) / (s + 1e-10)
         food = (food - m) / (s + 1e-10)
 
-        dtest, dood = self.get_scores(ftrain, ftest, food, labelstrain, args)
+        dtest, dood = self.get_scores(ftrain, ftrain, food, labelstrain, args)
 
         fpr95 = self.get_fpr(dtest, dood)  # TPR＝95%时，对应的FPR，以in-test为标的
         auroc, aupr = self.get_roc_sklearn(dtest, dood), self.get_pr_sklearn(dtest, dood)  # AUROC面积，平均precision
         return fpr95, auroc, aupr
 
+    def get_loc(self, ftrain, food, labelstrain, args):
+        """
+        None.
+        """
+        # standardize data
+        # ftrain = [i / np.linalg.norm(i, axis=-1, keepdims=True) + 1e-10 for i in ftrain]
+        score = 0
+        location = 0
+        for loc in range(1, len(ftrain), 1):
+            ftrain /= np.linalg.norm(ftrain, axis=-1, keepdims=True) + 1e-10  # 求多个行向量的范数，然后归一化
+            food /= np.linalg.norm(food, axis=-1, keepdims=True) + 1e-10
 
-def get_features(network, dataloader, max_images=10 ** 10, verbose=False):
-    features, labels = [], []
-    total = 0
+            m, s = np.mean(ftrain, axis=0, keepdims=True), np.std(ftrain, axis=0, keepdims=True)
 
+            ftrain = (ftrain - m) / (s + 1e-10)  # M-距离
+            food = (food - m) / (s + 1e-10)
+
+            dtest, dood = self.get_scores(ftrain, ftrain, food, labelstrain, args)
+            if score < np.mean(dood) - np.mean(dtest):
+                location = loc
+        # fpr95 = self.get_fpr(dtest, dood)  # TPR＝95%时，对应的FPR，以in-test为标的
+        # auroc, aupr = self.get_roc_sklearn(dtest, dood), self.get_pr_sklearn(dtest, dood)  # AUROC面积，平均precision
+        return loc  # fpr95, auroc, aupr
+
+
+def get_features(network, loaders, device):
     network.eval()
+    labels = []
+    features = []
+    for loader in loaders:
+        all_x = torch.cat([x for x, y, ind in loader]).to(device)
+        labels.append(torch.cat([y for x, y, ind in loader]).numpy())
+        features.append(network.featurizer(all_x).detach().cpu().numpy())
 
-    for index, (img, label) in enumerate(dataloader):
-
-        if total > max_images:
-            break
-
-        img, label = img.cuda(), label.cuda()
-
-        features += list(network.featurizer(img).data.cpu().numpy())
-        labels += list(label.data.cpu().numpy())
-
-        if verbose and not index % 50:
-            print(index)
-
-        total += len(img)
-
-    return np.array(features), np.array(labels)
+    return features, labels
 
 
 def random_pairs_of_minibatches(minibatches):
@@ -453,10 +468,12 @@ def accuracy(network, loader, weights, device):
         y_true = all_y.cpu().numpy()
         y_pred = np.argmax(all_p.cpu().numpy(), axis=-1)
         accuracy = accuracy_score(y_true, y_pred)
-        location = np.where(y_true == 1)[0][0] - np.where(y_pred == 1)[0][0] + 0.
+        ploc = all_x.shape[0] if  np.where(y_pred == 1)[0].shape[0] == 0 else np.where(y_pred == 1)[0][0]
+        location = np.where(y_true == 1)[0][0] - ploc + 0.
 
     network.train()
     return accuracy, location
+
 
 def cm2(loader, network, device):
     network.eval()

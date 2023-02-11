@@ -74,7 +74,7 @@ class Algorithm(torch.nn.Module):
         super(Algorithm, self).__init__()
         self.hparams = hparams
 
-    def update(self, minibatches, location, unlabeled=None):
+    def update(self, minibatches, unlabeled=None):
         """
         Perform one update step, given a list of (x, y) tuples for all
         environments.
@@ -123,18 +123,33 @@ class ERM(Algorithm):
             weight_decay=self.hparams['weight_decay']
         )
 
-    def update(self, minibatches, location, unlabeled=None):
+    def update(self, minibatches, unlabeled=None):
+        all_x = torch.cat([x for x, y, ind in minibatches])
+        all_y = torch.cat([y for x, y, ind in minibatches]).long()
+        all_p = self.predict(all_x)
+        score = torch.argmax(all_p.detach(), dim=-1)
+        dis = torch.sum(all_y ^ score)
+        loss = F.cross_entropy(all_p, all_y) + 0.08 * dis # ARM在predict处不同，输出也不同
+
         # all_x = torch.cat([x for x, y, ind in minibatches])
         # all_y = torch.cat([y for x, y, ind in minibatches]).long()
-        # loss = F.cross_entropy(self.predict(all_x), all_y)  # ARM在predict处不同，输出也不同
-        loss = 0.
-        l = 0
-        for x, y, ind in minibatches:
-            pred = self.predict(x)
-            score = np.argmax(pred.cpu().detach().numpy(), axis=-1)
-            loc = location[l] - ind[np.where(score == 1)[0][0]] if ind[0]<=location[l] else 0
-            loss = F.cross_entropy(self.predict(x), y) + 0.01
-            l += 1
+        # loss = F.cross_entropy(self.predict(all_x), all_y)
+
+        # loss = 0.
+        # l = 0
+        # for x, y, ind in minibatches:
+        #     pred = self.predict(x)
+        #     score = np.argmax(pred.cpu().detach().numpy(), axis=-1)
+        #     index = ind.cpu()
+        #     if (location[l] in index) or (np.unique(score).shape[0]==1):
+        #         dis = torch.tensor(0.)
+        #     else:
+        #         if ind[0] < location[l]:
+        #             dis = 0.001 * (location[l] - index[np.where(score == 1)[0][0]])
+        #         else:
+        #             dis = 0.001 * (location[l] - index[np.where(score == 0)[0][0]])
+        #     loss += F.cross_entropy(self.predict(x), y.long()) + dis.long()
+        #     l += 1
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -2273,7 +2288,10 @@ class FC(Algorithm):
                 feat_a = self.featurizer(x_subset_a)  # 提取特征
                 pred_a = self.phi(feat_a)  # 预测类别
 
-                loss_main = self.ce_loss(pred_a, y_subset_a)  # 对训练数据，计算ce_loss eq.1
+                score = torch.argmax(pred_a.detach(), dim=-1)
+                dis = torch.sum(y_subset_a ^ score)
+
+                loss_main = self.ce_loss(pred_a, y_subset_a) + 0.1 * dis # 对训练数据，计算ce_loss eq.1
                 meta_train_loss_main += loss_main  # 特征提取器、分类的loss
                 loss_dg = self.hparams['beta'] * self.omega(feat_a)  # aux_loss eq.6/7
 

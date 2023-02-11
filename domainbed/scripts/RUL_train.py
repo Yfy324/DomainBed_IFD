@@ -29,12 +29,12 @@ from visdom import Visdom
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Domain generalization')
-    parser.add_argument('--train', default=True, type=bool)
+    parser.add_argument('--train', default=False, type=bool)
     parser.add_argument('--data_dir', default=r'/data/yfy/FD-data/RUL/RUL_ts', type=str)
     parser.add_argument('--dataset', type=str, default="RUL")
     parser.add_argument('--data_name', type=int, default=['PHM1'],
                         help='each index corresponds to a str in [PHM1, PHM2, PHM3, XJTU1, XJTU2]')
-    parser.add_argument('--algorithm', type=str, default="ERM")
+    parser.add_argument('--algorithm', type=str, default="FC")
     parser.add_argument('--task', type=str, default="domain_generalization",
                         choices=["domain_generalization", "domain_adaptation"])
     parser.add_argument('--hparams', type=str,
@@ -50,7 +50,7 @@ if __name__ == "__main__":
                         help='Number of steps. Default is dataset-dependent.')
     parser.add_argument('--checkpoint_freq', type=int, default=None,
                         help='Checkpoint every N steps. Default is dataset-dependent.')
-    parser.add_argument('--test_envs', type=int, nargs='+', default=['XJTU1'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
+    parser.add_argument('--test_envs', type=int, nargs='+', default=['PHM1'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
     parser.add_argument('--output_dir', type=str, default="train_output")
     parser.add_argument('--holdout_fraction', type=float, default=0.2)
     parser.add_argument('--uda_holdout_fraction', type=float, default=0,
@@ -66,9 +66,10 @@ if __name__ == "__main__":
     start_step = 0
     algorithm_dict = None
 
-    os.makedirs(args.output_dir, exist_ok=True)   # /scripts/train_output
-    sys.stdout = misc.Tee(os.path.join(args.output_dir, 'out.txt'))
-    sys.stderr = misc.Tee(os.path.join(args.output_dir, 'err.txt'))
+    # TODO: remove the annotation below
+    # os.makedirs(args.output_dir, exist_ok=True)   # /scripts/train_output
+    # sys.stdout = misc.Tee(os.path.join(args.output_dir, 'out.txt'))
+    # sys.stderr = misc.Tee(os.path.join(args.output_dir, 'err.txt'))
 
     # viz = Visdom()
     # viz.line([0.], [1.], win='train_loss', opts=dict(title='train_loss'))
@@ -134,11 +135,11 @@ if __name__ == "__main__":
         in_splits, te_splits, tr_splits, out_splits = [], [], [], []
 
         # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
-        # if args.data_name == args.test_envs:
-        tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
+        # if args.data_name == args.test_envs:  [0, 1, 2, 3, 4, 5, 6]
+        tr_index = {i: [0, 1] for i in args.data_name}  # range(len(train_x[i]))
         te_index = {i: [0, 1] for i in args.test_envs}
 
-        tr_loc = RUL_dict[args.data_name][tr_index[args.data_name]]
+        tr_loc = [RUL_dict[args.data_name[0]][i] for i in tr_index[args.data_name[0]]]
 
         for k, v in te_index.items():
             for i in v:
@@ -176,7 +177,7 @@ if __name__ == "__main__":
             num_workers=dataset.N_WORKERS)
             for env in in_splits] # in
 
-        meta_test_loaders = [InfiniteDataLoader(  # 这是一个自编无限数据loader
+        meta_test_loaders = [InfiniteDataLoader(
             dataset=env,
             weights=None,
             batch_size=hparams['batch_size'],
@@ -273,7 +274,7 @@ if __name__ == "__main__":
                               for x, _ in next(uda_minibatches_iterator)]
             else:
                 uda_device = None
-            step_vals = algorithm.update(minibatches_device, tr_loc, uda_device)   # 返回的是loss 字典
+            step_vals = algorithm.update(minibatches_device, uda_device)   # 返回的是loss 字典
             checkpoint_vals['step_time'].append(time.time() - step_start_time)
 
             for key, val in step_vals.items():
@@ -334,9 +335,9 @@ if __name__ == "__main__":
 
         critic = misc.Fpr(device)
         for loader in test_loaders:
-            score, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
-            location = np.where(score == 1)[0][0]
-            print('fault location: ', location)
+            location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            # location = np.where(score == 1)[0][0]
+            print('fault location: ', location[0])
             print('aupr: ', aupr)
             print('auroc: ', auroc)
             print('fpr95: ', fpr95)
@@ -353,6 +354,10 @@ if __name__ == "__main__":
         model_dir = r'/home/yfy/IFD/DomainBed-IFD/domainbed/scripts/train_output/model.pkl'
         model_dict = torch.load(model_dir)["model_dict"]
         algorithm.load_state_dict(state_dict=model_dict)
+        in_features, in_labels = misc.get_features(algorithm, tr_loaders, device)
+        ood_features, ood_labels = misc.get_features(algorithm, test_loaders, device)
+        fpr95, auroc, aupr = misc.SSD_score().get_eval_results(in_features[0][:1006], in_features[0][1006:], in_labels, args=True)
+
         critic = misc.Fpr(device)
         for loader in test_loaders:
             location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
