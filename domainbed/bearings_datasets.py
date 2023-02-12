@@ -1329,7 +1329,16 @@ class BearingRUL(object):
             bearing_lab[i] = []
             x = np.load(os.path.join(self.dir, i+'.npy'), allow_pickle=True).item()
             for k, v in x.items():
-                bearing_data[i].append(v.transpose(0, 2, 1))
+                v1 = np.fft.fft(v[:, :, 0])
+                v1 = np.abs(v1) / len(v1)
+                v1 = v1[:, range(int(v1.shape[1] / 2))]
+
+                v2 = np.fft.fft(v[:, :, 1])
+                v2 = np.abs(v2) / len(v2)
+                v2 = v2[:, range(int(v2.shape[1] / 2))]
+
+                bearing_data[i].append(np.stack((v1, v2), axis=1))
+                # bearing_data[i].append(v.transpose(0, 2, 1))
 
             for j, v1 in y.items():
                 if i in j:

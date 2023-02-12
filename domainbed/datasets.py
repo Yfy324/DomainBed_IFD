@@ -647,14 +647,14 @@ class Bearing(object):
 
 
 class RUL(object):
-    N_STEPS = 1001  # 851 Default, subclasses may override
+    N_STEPS = 651  # 851 Default, subclasses may override
     CHECKPOINT_FREQ = 50  # Default, subclasses may override
     N_WORKERS = 8  # Default, subclasses may override
     ENVIRONMENTS = ['PHM1', 'PHM2', 'PHM3', 'XJTU1', 'XJTU2']  # Subclasses should override
-    INPUT_SHAPE = (2, 2560)  # Subclasses should override
+    INPUT_SHAPE = (1, 1280)  # Subclasses should override
 
     def __init__(self, data_dir, dataname, test_envs):
-        self.input_shape = (2, 2560)
+        self.input_shape = (2, 1280)
         self.num_classes = 2
         self.dir = data_dir
         # self.train = [RUL.ENVIRONMENTS[i] for i in dataname]

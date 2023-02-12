@@ -377,29 +377,35 @@ class SSD_score():
         auroc, aupr = self.get_roc_sklearn(dtest, dood), self.get_pr_sklearn(dtest, dood)  # AUROC面积，平均precision
         return fpr95, auroc, aupr
 
-    def get_loc(self, ftrain, food, labelstrain, args):
+    def get_loc(self, ftrain, labelstrain, floc):
         """
         None.
         """
         # standardize data
         # ftrain = [i / np.linalg.norm(i, axis=-1, keepdims=True) + 1e-10 for i in ftrain]
-        score = 0
+        score = []
         location = 0
-        for loc in range(1, len(ftrain), 1):
-            ftrain /= np.linalg.norm(ftrain, axis=-1, keepdims=True) + 1e-10  # 求多个行向量的范数，然后归一化
+        for loc in floc:  # range(1, len(ftrain), 1):
+            fin, food = ftrain[:loc], ftrain[loc:]
+            fin /= np.linalg.norm(fin, axis=-1, keepdims=True) + 1e-10  # 求多个行向量的范数，然后归一化
             food /= np.linalg.norm(food, axis=-1, keepdims=True) + 1e-10
 
-            m, s = np.mean(ftrain, axis=0, keepdims=True), np.std(ftrain, axis=0, keepdims=True)
+            m, s = np.mean(fin, axis=0, keepdims=True), np.std(fin, axis=0, keepdims=True)
 
-            ftrain = (ftrain - m) / (s + 1e-10)  # M-距离
+            fin = (fin - m) / (s + 1e-10)  # M-距离
             food = (food - m) / (s + 1e-10)
 
-            dtest, dood = self.get_scores(ftrain, ftrain, food, labelstrain, args)
-            if score < np.mean(dood) - np.mean(dtest):
-                location = loc
+            dtest, dood = self.get_scores(fin, fin, food, labelstrain, args=True)
+            # if score < np.mean(dood) - np.mean(dtest):
+            #     location = loc
+            #     score = np.mean(dood) - np.mean(dtest)
+            score.append(np.mean(dood) - np.mean(dtest))
+
+        desc_score_indices = np.argsort(np.array(score), kind="mergesort")[::-1]
+        fwhere = floc[desc_score_indices]
         # fpr95 = self.get_fpr(dtest, dood)  # TPR＝95%时，对应的FPR，以in-test为标的
         # auroc, aupr = self.get_roc_sklearn(dtest, dood), self.get_pr_sklearn(dtest, dood)  # AUROC面积，平均precision
-        return loc  # fpr95, auroc, aupr
+        return fwhere  # fpr95, auroc, aupr
 
 
 def get_features(network, loaders, device):

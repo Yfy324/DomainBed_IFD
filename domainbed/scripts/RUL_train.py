@@ -50,7 +50,7 @@ if __name__ == "__main__":
                         help='Number of steps. Default is dataset-dependent.')
     parser.add_argument('--checkpoint_freq', type=int, default=None,
                         help='Checkpoint every N steps. Default is dataset-dependent.')
-    parser.add_argument('--test_envs', type=int, nargs='+', default=['PHM1'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
+    parser.add_argument('--test_envs', type=int, nargs='+', default=['PHM2'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
     parser.add_argument('--output_dir', type=str, default="train_output")
     parser.add_argument('--holdout_fraction', type=float, default=0.2)
     parser.add_argument('--uda_holdout_fraction', type=float, default=0,
@@ -136,8 +136,8 @@ if __name__ == "__main__":
 
         # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
         # if args.data_name == args.test_envs:  [0, 1, 2, 3, 4, 5, 6]
-        tr_index = {i: [0, 1] for i in args.data_name}  # range(len(train_x[i]))
-        te_index = {i: [0, 1] for i in args.test_envs}
+        tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
+        te_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.test_envs}
 
         tr_loc = [RUL_dict[args.data_name[0]][i] for i in tr_index[args.data_name[0]]]
 
@@ -356,15 +356,19 @@ if __name__ == "__main__":
         algorithm.load_state_dict(state_dict=model_dict)
         in_features, in_labels = misc.get_features(algorithm, tr_loaders, device)
         ood_features, ood_labels = misc.get_features(algorithm, test_loaders, device)
-        fpr95, auroc, aupr = misc.SSD_score().get_eval_results(in_features[0][:1006], in_features[0][1006:], in_labels, args=True)
+        # fpr95, auroc, aupr = misc.SSD_score().get_eval_results(in_features[0][:1006], in_features[0][1006:], in_labels, args=True)
+        # fault_location = misc.SSD_score().get_loc(in_features[0], in_labels)
 
         critic = misc.Fpr(device)
+        count = 0
         for loader in test_loaders:
             location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            fault_location = misc.SSD_score().get_loc(in_features[count], in_labels, location)
             # location = np.where(score == 1)[0][0]
             print('fault location: ', location[0])
             print('aupr: ', aupr)
             print('auroc: ', auroc)
             print('fpr95: ', fpr95)
 
+            count += 1
 
