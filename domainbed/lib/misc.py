@@ -231,7 +231,7 @@ class Fpr(Critic):
         cutoff = np.argmin(np.abs(recall - recall_level))  # 找到recall大于0.95对应的索引
         location = np.where(locations < thresholds[cutoff])[0]
 
-        return location, aupr, auroc, fps[cutoff] / (np.sum(np.logical_not(y_true)))  # fps[cutoff]/(fps[cutoff] + tps[cutoff]) 计算recall=0.95是对应的fps
+        return locations, location, aupr, auroc, fps[cutoff] / (np.sum(np.logical_not(y_true)))  # fps[cutoff]/(fps[cutoff] + tps[cutoff]) 计算recall=0.95是对应的fps
 
     def get_score(self, model_output):
         to_np = lambda x: x.data.cpu().numpy()
@@ -247,11 +247,47 @@ class Fpr(Critic):
             all_p = network.predict(all_x)
             y_true = all_y.cpu().numpy()
             y_pred = np.argmax(all_p.cpu().numpy(), axis=-1)
-            # fault = np.where(y_true == 1)[0][0]
+            fault = np.where(y_true == 1)[0][0]
+
             # all_loc = range(all_x.shape[0])
             y_score = self.get_score(all_p)
         network.train()
         return self.fpr_and_fdr_at_recall(y_pred, y_true, y_score, self.recall_level)
+
+    def test_time(self, network, loader, device):
+        network.eval()
+        with torch.no_grad():
+            all_x = np.array([])
+            fea = np.array([])
+            location = []
+            score = []
+
+            for x, y, ind in loader:
+                x = x.to(device)
+                y = y.numpy()
+                ind = ind.numpy()
+                feature = network.featurizer(x).detach().cpu().numpy()
+                fea = feature if ind[0] == 0 else np.vstack((fea, feature))
+                pred = network.predict(x)
+                pred_y = torch.argmax(pred.detach(), dim=-1)
+                p_score = self.get_score(pred)
+                if 1 in pred_y:
+                    loc = np.where(pred_y.detach().cpu().numpy() == 1)[0]
+                    loc = np.delete(loc, 0) if ind[loc[0]] == 0 else loc
+                    floc = np.array([ind[i] for i in loc], dtype=int)
+                    fault_location, ssd_score = SSD_score().get_loc(fea, y, floc)
+                    score += ssd_score
+                    location += floc.tolist()
+
+                # if 1 in pred_y:
+                #     loc = np.where(pred_y.detach().cpu().numpy() == 1)[0]
+                #     loc = np.delete(loc, 0) if ind[loc[0]] == 0 else loc
+                #     fault_location, ssd_score = SSD_score().get_loc(fea, y, loc)
+                #     floc = [ind[i] for i in fault_location]
+
+                all_x = x.cpu().numpy() if ind[0] == 0 else np.vstack((all_x, x.cpu().numpy()))
+        network.train()
+        return location, score
 
 
 class SSD_score():
@@ -395,7 +431,9 @@ class SSD_score():
             fin = (fin - m) / (s + 1e-10)  # M-距离
             food = (food - m) / (s + 1e-10)
 
-            dtest, dood = self.get_scores(fin, fin, food, labelstrain, args=True)
+            # dtest, dood = self.get_scores(fin, fin, food, labelstrain, args=True)
+            dtest, dood = self.get_scores_one_cluster(fin, fin, food)
+
             # if score < np.mean(dood) - np.mean(dtest):
             #     location = loc
             #     score = np.mean(dood) - np.mean(dtest)
@@ -405,7 +443,7 @@ class SSD_score():
         fwhere = floc[desc_score_indices]
         # fpr95 = self.get_fpr(dtest, dood)  # TPR＝95%时，对应的FPR，以in-test为标的
         # auroc, aupr = self.get_roc_sklearn(dtest, dood), self.get_pr_sklearn(dtest, dood)  # AUROC面积，平均precision
-        return fwhere  # fpr95, auroc, aupr
+        return fwhere, score # fpr95, auroc, aupr
 
 
 def get_features(network, loaders, device):
@@ -418,6 +456,21 @@ def get_features(network, loaders, device):
         features.append(network.featurizer(all_x).detach().cpu().numpy())
 
     return features, labels
+
+
+def get_score(network, loader, device):
+    to_np = lambda x: x.data.cpu().numpy()
+    network.eval()
+    with torch.no_grad():
+        all_x = torch.cat([x for x, y, ind in loader]).to(device)
+        all_y = torch.cat([y for x, y, ind in loader]).to(device)
+        all_p = network.predict(all_x)
+        # y_true = all_y.cpu().numpy()
+        # y_pred = np.argmax(all_p.cpu().numpy(), axis=-1)
+        score = to_np(F.softmax(all_p, dim=1))  # 按行softmax，保证行和为1 (第1维度进行归一化)
+        # score = np.max(score, axis=1)  # 保存的是每个预测最大的softmax score，而不是预测的标签
+
+    return score
 
 
 def random_pairs_of_minibatches(minibatches):

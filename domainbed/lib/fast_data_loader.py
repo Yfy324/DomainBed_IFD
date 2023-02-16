@@ -39,7 +39,6 @@ class InfiniteDataLoader:
             dataset,
             num_workers=num_workers,
             batch_sampler=_InfiniteSampler(batch_sampler),
-            shuffle=False
         ))
 
     def __iter__(self):

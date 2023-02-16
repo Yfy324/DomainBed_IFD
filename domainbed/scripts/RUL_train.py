@@ -50,7 +50,7 @@ if __name__ == "__main__":
                         help='Number of steps. Default is dataset-dependent.')
     parser.add_argument('--checkpoint_freq', type=int, default=None,
                         help='Checkpoint every N steps. Default is dataset-dependent.')
-    parser.add_argument('--test_envs', type=int, nargs='+', default=['PHM2'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
+    parser.add_argument('--test_envs', type=int, nargs='+', default=['PHM3'])  # PU [8,9,10,11])  # TODO: for cv, modify the default to [0]
     parser.add_argument('--output_dir', type=str, default="train_output")
     parser.add_argument('--holdout_fraction', type=float, default=0.2)
     parser.add_argument('--uda_holdout_fraction', type=float, default=0,
@@ -136,10 +136,13 @@ if __name__ == "__main__":
 
         # loader_index = tr_num if tr_num != 1 else len(train_x['0'])
         # if args.data_name == args.test_envs:  [0, 1, 2, 3, 4, 5, 6]
-        tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
-        te_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.test_envs}
 
-        tr_loc = [RUL_dict[args.data_name[0]][i] for i in tr_index[args.data_name[0]]]
+        tr_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.data_name}  # range(len(train_x[i]))
+        # te_index = {i: [0, 1, 2, 3, 4, 5, 6] for i in args.test_envs}
+        te_index = {i: [0, 1] for i in args.test_envs}
+
+        # tr_index = {i: [0, 1, 2, 3, 4] for i in args.data_name}  # range(len(train_x[i]))
+        # te_index = {i: [0, 1, 2, 3, 4] for i in args.test_envs}
 
         for k, v in te_index.items():
             for i in v:
@@ -174,20 +177,20 @@ if __name__ == "__main__":
             dataset=env,
             weights=None,
             batch_size=hparams['batch_size'],
-            num_workers=dataset.N_WORKERS)
+            num_workers=0)
             for env in in_splits] # in
 
         meta_test_loaders = [InfiniteDataLoader(
             dataset=env,
             weights=None,
             batch_size=hparams['batch_size'],
-            num_workers=dataset.N_WORKERS)
+            num_workers=0)
             for env in in_splits]  # in
 
         eval_loaders = [DataLoader(
             dataset=env,
             batch_size=hparams['batch_size'],
-            num_workers=dataset.N_WORKERS,
+            num_workers=0,
             drop_last=False,
             shuffle=False
         )
@@ -196,8 +199,8 @@ if __name__ == "__main__":
 
         test_loaders = [DataLoader(
             dataset=env,
-            batch_size=hparams['batch_size'],
-            num_workers=dataset.N_WORKERS,
+            batch_size=8,
+            num_workers=0,
             drop_last=False,
             shuffle=False
         )
@@ -206,7 +209,7 @@ if __name__ == "__main__":
         tr_loaders = [DataLoader(
             dataset=env,
             batch_size=hparams['batch_size'],
-            num_workers=dataset.N_WORKERS,
+            num_workers=0,
             drop_last=False,
             shuffle=False
         )
@@ -335,7 +338,7 @@ if __name__ == "__main__":
 
         critic = misc.Fpr(device)
         for loader in test_loaders:
-            location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            locs, location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
             # location = np.where(score == 1)[0][0]
             print('fault location: ', location[0])
             print('aupr: ', aupr)
@@ -352,23 +355,40 @@ if __name__ == "__main__":
 
     else:
         model_dir = r'/home/yfy/IFD/DomainBed-IFD/domainbed/scripts/train_output/model.pkl'
+        # model_dir = r'/home/yfy/IFD/DomainBed-IFD/domainbed/results/RUL/phm1-phm2-450-0.82.pkl'
         model_dict = torch.load(model_dir)["model_dict"]
         algorithm.load_state_dict(state_dict=model_dict)
-        in_features, in_labels = misc.get_features(algorithm, tr_loaders, device)
-        ood_features, ood_labels = misc.get_features(algorithm, test_loaders, device)
+        # in_features, in_labels = misc.get_features(algorithm, tr_loaders, device)
+        # ood_features, ood_labels = misc.get_features(algorithm, test_loaders, device)
+
         # fpr95, auroc, aupr = misc.SSD_score().get_eval_results(in_features[0][:1006], in_features[0][1006:], in_labels, args=True)
         # fault_location = misc.SSD_score().get_loc(in_features[0], in_labels)
 
         critic = misc.Fpr(device)
         count = 0
+        train_score, test_score, score = {}, {}, {}
+        train_loc, test_loc = {}, {}
+        # for loader in tr_loaders:
+        #     train_score[count] = misc.get_score(algorithm, loader, device)
+        #     # train_loc[count], sc = critic.test_time(algorithm, loader, device)
+        #
+        #     count += 1
+        #
+        # count = 0
         for loader in test_loaders:
-            location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
-            fault_location = misc.SSD_score().get_loc(in_features[count], in_labels, location)
-            # location = np.where(score == 1)[0][0]
-            print('fault location: ', location[0])
-            print('aupr: ', aupr)
-            print('auroc: ', auroc)
-            print('fpr95: ', fpr95)
+            test_score[count] = misc.get_score(algorithm, loader, device)
+            test_loc[count] = np.where(test_score[count][:, 1] > 0.96)[0]
+            # test_loc[count], sc = critic.test_time(algorithm, loader, device)
+
+            # locs, location, aupr, auroc, fpr95 = critic.evaluate(algorithm, loader)
+            # location = np.delete(location, 0) if location[0] == 0 else location
+            # fault_location = misc.SSD_score().get_loc(in_features[count], in_labels, location)
+            # # location = np.where(score == 1)[0][0]
+            # print('fault location: ', location[0])
+            # print('aupr: ', aupr)
+            # print('auroc: ', auroc)
+            # print('fpr95: ', fpr95)
 
             count += 1
 
+print(1)
